@@ -1,4 +1,4 @@
-package de.incentergy.iso11783.part10.v4;
+package de.incentergy.iso11783.part10;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -64,7 +64,7 @@ public class ISOXMLGenerator {
 			customer.setCustomerLastName("Customer");
 			customer.setCustomerId("CTR-1");
 			
-			iso11783TaskData.getCustomer().add(customer);
+			iso11783TaskData.getAFE().add(customer);
 			
 			Farm farm = new Farm();
 			farm.setFarmDesignator("Gen Farm");
