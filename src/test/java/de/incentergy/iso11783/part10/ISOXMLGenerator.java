@@ -64,7 +64,7 @@ public class ISOXMLGenerator {
 			customer.setCustomerLastName("Customer");
 			customer.setCustomerId("CTR-1");
 			
-			iso11783TaskData.getAFE().add(customer);
+			iso11783TaskData.getAFEOrBSNOrCC().add(customer);
 			
 			Farm farm = new Farm();
 			farm.setFarmDesignator("Gen Farm");
