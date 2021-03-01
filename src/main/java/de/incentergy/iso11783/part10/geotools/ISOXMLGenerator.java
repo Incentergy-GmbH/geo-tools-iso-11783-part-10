@@ -1,4 +1,4 @@
-package de.incentergy.iso11783.part10;
+package de.incentergy.iso11783.part10.geotools;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -81,7 +81,7 @@ public class ISOXMLGenerator {
 			Farm farm = new Farm();
 			farm.setFarmDesignator("Gen Farm");
 			farm.setFarmId("FRM-1");
-			farm.setCustomerIdRef(customer.getCustomerId());
+			farm.setCustomerIdRef(customer);
 
 			iso11783TaskData.getFarm().add(farm);
 
@@ -98,12 +98,12 @@ public class ISOXMLGenerator {
 			product.setProductDesignator("Saatgut Mais - ES Eurojet");
 			product.setProductId("PDT-1");
 			iso11783TaskData.getProduct().add(product);
-			cropVariety.setProductIdRef(product.getProductId());
+			cropVariety.setProductIdRef(product);
 
 			iso11783TaskData.getCropType().add(cropType);
 
-			Partfield partfield = getPartfield(farm.getFarmId(), customer.getCustomerId(), cropType.getCropTypeId(),
-					cropVariety.getCropVarietyId());
+			Partfield partfield = getPartfield(farm, customer, cropType,
+					cropVariety);
 
 			iso11783TaskData.getPartfield().add(partfield);
 
@@ -120,7 +120,7 @@ public class ISOXMLGenerator {
 			iso11783TaskData.getOperationTechnique().add(operationTechnique);
 
 			OperationTechniqueReference operationTechniqueReference = new OperationTechniqueReference();
-			operationTechniqueReference.setOperationTechniqueIdRef(operationTechnique.getOperationTechniqueId());
+			operationTechniqueReference.setOperationTechniqueIdRef(operationTechnique);
 			culturalPractice.getOperationTechniqueReference().add(operationTechniqueReference);
 
 			Task task = new Task();
@@ -134,11 +134,11 @@ public class ISOXMLGenerator {
 			task.setTaskStatus(TaskStatus.COMPLETED);
 			task.setTaskId("TSK-1");
 			OperTechPractice operTechPractice = new OperTechPractice();
-			operTechPractice.setCulturalPracticeIdRef(culturalPractice.getCulturalPracticeId());
-			operTechPractice.setOperationTechniqueIdRef(operationTechnique.getOperationTechniqueId());
+			operTechPractice.setCulturalPracticeIdRef(culturalPractice);
+			operTechPractice.setOperationTechniqueIdRef(operationTechnique);
 			task.setOperTechPractice(operTechPractice);
-			task.setCustomerIdRef(customer.getCustomerId());
-			task.setPartfieldIdRef(partfield.getPartfieldId());
+			task.setCustomerIdRef(customer);
+			task.setPartfieldIdRef(partfield);
 
 			Device device = new Device();
 			device.setDeviceId("DVC-1");
@@ -152,7 +152,7 @@ public class ISOXMLGenerator {
 			iso11783TaskData.getDevice().add(device);
 
 			DeviceAllocation deviceAllocation = new DeviceAllocation();
-			deviceAllocation.setDeviceIdRef("DVC-1");
+			deviceAllocation.setDeviceIdRef(device);
 
 			task.getDeviceAllocation().add(deviceAllocation);
 
@@ -201,17 +201,17 @@ public class ISOXMLGenerator {
 		}
 	}
 
-	private static Partfield getPartfield(String farmId, String customerId, String cropTypeId, String cropVarietyId) {
+	private static Partfield getPartfield(Farm farm, Customer customer, CropType cropType, CropVariety cropVariety) {
 //		<PFD A="PFD1" B="ed5440f0-5304-408a-a527-33b68b28" C="7 Partfield 2017" D="45550" E="CTR1" F="FRM1">
 		Partfield partfield = new Partfield();
 		partfield.setPartfieldId("PFD-1");
 		partfield.setPartfieldCode("ed5440f0-5304-408a-a527-33b68b28");
 		partfield.setPartfieldDesignator("7 Partfield 2017");
 		partfield.setPartfieldArea(45550);
-		partfield.setCustomerIdRef(customerId);
-		partfield.setFarmIdRef(farmId);
-		partfield.setCropTypeIdRef(cropTypeId);
-		partfield.setCropVarietyIdRef(cropVarietyId);
+		partfield.setCustomerIdRef(customer);
+		partfield.setFarmIdRef(farm);
+		partfield.setCropTypeIdRef(cropType);
+		partfield.setCropVarietyIdRef(cropVariety);
 
 //        <PLN A="1" C="45550">
 		Polygon polygon = new Polygon();
