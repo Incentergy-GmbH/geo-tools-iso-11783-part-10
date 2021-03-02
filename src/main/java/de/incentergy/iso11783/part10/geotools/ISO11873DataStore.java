@@ -53,14 +53,16 @@ public class ISO11873DataStore extends ContentDataStore {
 		if (url.getProtocol().equals("file")) {
 			try {
 				Path path = Paths.get(url.toURI());
-				Files.list(path).forEach((consumer) -> {
-					try {
-						files.put(consumer.toUri().toURL(),
-								(ISO11783TaskDataFile) jaxbContext.createUnmarshaller().unmarshal(consumer.toFile()));
-					} catch (MalformedURLException | JAXBException e) {
-						e.printStackTrace();
-					}
-				});
+				Files.list(path)
+                    .filter(consumer -> consumer.endsWith(".XML"))
+                    .forEach((consumer) -> {
+                        try {
+                            files.put(consumer.toUri().toURL(),
+                                    (ISO11783TaskDataFile) jaxbContext.createUnmarshaller().unmarshal(consumer.toFile()));
+                        } catch (MalformedURLException | JAXBException e) {
+                            e.printStackTrace();
+                        }
+                    });
 			} catch (URISyntaxException|IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
