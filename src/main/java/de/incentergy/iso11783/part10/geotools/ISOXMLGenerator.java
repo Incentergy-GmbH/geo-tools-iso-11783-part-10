@@ -67,7 +67,7 @@ public class ISOXMLGenerator {
 	}
 
 	public static void main(String[] args) throws JAXBException, IOException, DatatypeConfigurationException {
-		for (int sampleCount : Arrays.asList(/* 10 100000, */ 100000/* , 10000000 */)) {
+		for (int sampleCount : Arrays.asList(1000)) {
 			ISO11783TaskDataFile iso11783TaskData = new ISO11783TaskDataFile();
 			iso11783TaskData.setManagementSoftwareManufacturer(ISOXMLGenerator.class.getSimpleName());
 
