@@ -45,6 +45,13 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(entry.getName());
 
+		addAttributesForPartfield(builder);
+
+		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
+		return SCHEMA;
+	}
+
+	static void addAttributesForPartfield(SimpleFeatureTypeBuilder builder) {
 		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
 		builder.add("polygonNonTreatmentZoneOnly", MultiPolygon.class);
 		builder.add("partfieldId", String.class);
@@ -56,9 +63,6 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 		builder.add("cropTypeIdRef", String.class);
 		builder.add("cropVarietyIdRef", String.class);
 		builder.add("fieldIdRef", String.class);
-
-		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
-		return SCHEMA;
 	}
 
 }

@@ -8,17 +8,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.geotools.data.store.ContentState;
-import org.geotools.feature.NameImpl;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.feature.type.Name;
 
 import de.incentergy.iso11783.part10.v4.CropType;
 import de.incentergy.iso11783.part10.v4.CropVariety;
@@ -41,7 +37,7 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 	protected int index = 0;
 
 	/** Factory class for geometry creation */
-	private GeometryFactory geometryFactory;
+	private GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
 
 	/**
 	 * Copies the first point to the last if it is not the same.
@@ -57,12 +53,16 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 		return coordinates;
 	}
 
+	// only for unit test
+	PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, SimpleFeatureType featureType) {
+		this.taskDataFile = taskDataFile;
+		this.builder = new SimpleFeatureBuilder(featureType);
+	}
+
 	public PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, ContentState contentState) {
 		this.taskDataFile = taskDataFile;
 		this.state = contentState;
-		builder = new SimpleFeatureBuilder(
-				state != null ? state.getFeatureType() : new SimpleFeatureTypeBuilder().buildFeatureType());
-		geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
+		builder = new SimpleFeatureBuilder(state.getFeatureType());
 	}
 
 	@Override

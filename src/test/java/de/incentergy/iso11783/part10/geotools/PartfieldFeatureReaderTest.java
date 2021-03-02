@@ -10,8 +10,10 @@ import java.util.NoSuchElementException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.jupiter.api.Test;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
@@ -23,7 +25,11 @@ class PartfieldFeatureReaderTest {
 			ISO11783TaskDataFile iSO11783TaskDataFile = (ISO11783TaskDataFile) JAXBContext
 					.newInstance(ISO11783TaskDataFile.class).createUnmarshaller()
 					.unmarshal(getClass().getResourceAsStream("/PartfieldFeatureReaderTest/TASKDATA.XML"));
-			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(iSO11783TaskDataFile, null);
+			SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+			builder.setName("Test");
+			ISO11783FeatureSource.addAttributesForPartfield(builder);
+			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(iSO11783TaskDataFile,
+					builder.buildFeatureType());
 			assertTrue(partfieldFeatureReader.hasNext());
 			SimpleFeature simpleFeature = partfieldFeatureReader.next();
 			assertFalse(partfieldFeatureReader.hasNext());
