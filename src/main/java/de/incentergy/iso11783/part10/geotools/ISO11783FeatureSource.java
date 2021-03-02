@@ -30,7 +30,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
 		switch(query.getTypeName()) {
 			case PartfieldFeatureReader.TYPE_NAME_STRING:
-				return new PartfieldFeatureReader();
+				return new PartfieldFeatureReader(null, null);
 		}
 		return null;
 	}
