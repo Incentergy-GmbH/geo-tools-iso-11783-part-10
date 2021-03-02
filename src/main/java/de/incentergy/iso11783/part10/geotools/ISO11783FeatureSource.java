@@ -43,9 +43,10 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected SimpleFeatureType buildFeatureType() throws IOException {
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-   		b.setFeatureTypeFactory( getDataStore().getFeatureTypeFactory() );
-		return b.buildFeatureType();
+//		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+// 		b.setFeatureTypeFactory( getDataStore().getFeatureTypeFactory() );
+// 		return b.buildFeatureType();
+   		return PartfieldFeatureReader.buildFeatureType();
 	}
 
 }

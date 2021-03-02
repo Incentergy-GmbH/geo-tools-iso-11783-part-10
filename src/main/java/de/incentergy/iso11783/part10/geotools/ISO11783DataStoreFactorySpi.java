@@ -10,7 +10,10 @@ import java.util.Map;
 import java.util.logging.Logger;
 import org.geotools.data.DataStore;
 import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.factory.CommonFactoryFinder;
+import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.KVP;
+import org.locationtech.jts.geom.GeometryFactory;
 
 public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 
@@ -29,7 +32,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 
     public static final Param URLP =
             new Param(
-                    "url",
+                    "isoxmlUrl",
                     URL.class,
                     "URL of files",
                     true,
@@ -55,7 +58,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
     @Override
     public boolean canProcess(Map<String, Serializable> params) {
         // params must not contain ISOXML
-        return !params.containsKey("dbtype");
+        return params.containsKey("isoxmlUrl");
     }
 
     @Override
@@ -83,6 +86,11 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
         if( rootPath != null){
             store.updateFilesFromURL(rootPath);
         }
+        
+        store.setDataStoreFactory(this);
+        store.setGeometryFactory(new GeometryFactory());
+        store.setFeatureTypeFactory(new FeatureTypeFactoryImpl());
+        store.setFeatureFactory(CommonFactoryFinder.getFeatureFactory(null));
         return store;
     }
 

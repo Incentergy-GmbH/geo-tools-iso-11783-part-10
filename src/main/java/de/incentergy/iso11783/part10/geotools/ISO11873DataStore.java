@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBContext;
@@ -23,9 +24,12 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
+
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11873DataStore extends ContentDataStore {
+	
+	private static Logger log = Logger.getLogger(ISO11873DataStore.class.getName());
 	private Map<URL, ISO11783TaskDataFile> files = new ConcurrentHashMap<>();
 
 	private static JAXBContext jaxbContext;
@@ -50,6 +54,7 @@ public class ISO11873DataStore extends ContentDataStore {
 	}
 
 	public void updateFilesFromURL(URL url){
+		log.info("Loading from url: "+url.toString());
 		if (url.getProtocol().equals("file")) {
 			try {
 				Path path = Paths.get(url.toURI());
@@ -66,7 +71,6 @@ public class ISO11873DataStore extends ContentDataStore {
                         }
                     });
 			} catch (URISyntaxException|IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}			
 		}
