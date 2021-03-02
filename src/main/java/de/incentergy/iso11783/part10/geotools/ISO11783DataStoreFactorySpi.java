@@ -72,13 +72,18 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
     @Override
     public DataStore createDataStore(Map<String, Serializable> params) throws IOException {
         log.info("Creating ISOXML Datastore from {0}");
-        // ISOXMLDataStore store = new ISOXMLDataStore();
+        ISO11873DataStore store = new ISO11873DataStore();
         URI namespace = lookup(NAMESPACEP, params, URI.class);
         if (namespace != null) {
-            // store.setNamespaceURI(namespace.toString());
+             store.setNamespaceURI(namespace.toString());
         }
-        // return store;
-        return null;
+
+        URL rootPath = lookup(URLP, params, URL.class);
+
+        if( rootPath != null){
+            store.updateFilesFromURL(rootPath);
+        }
+        return store;
     }
 
     /**
