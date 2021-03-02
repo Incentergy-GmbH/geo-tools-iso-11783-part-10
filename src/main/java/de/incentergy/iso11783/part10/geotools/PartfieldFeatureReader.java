@@ -1,8 +1,11 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.NameImpl;
@@ -10,6 +13,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LinearRing;
 import org.locationtech.jts.geom.MultiPolygon;
@@ -40,12 +44,29 @@ public class PartfieldFeatureReader extends AbstractFeatureReader{
     /** Factory class for geometry creation */
     private GeometryFactory geometryFactory;
 
+    public Coordinate[] coordinates(LineString ls) {
+        return ls.getPoint().stream().map(
+            point -> new Coordinate(
+                Double.valueOf(point.getPointEast()),
+                Double.valueOf(point.getPointNorth())
+            )).toArray(Coordinate[]::new);
+    }
+
 	public org.locationtech.jts.geom.Polygon mapPolygon(Polygon isoxmlPolygon){
-		Optional<LineString> isoxmlOuterRing =  isoxmlPolygon.getLineString().stream().filter((ls)-> ls.getLineStringType() == LineStringType.POLYGONEXTERIOR).findAny();
+		Optional<LineString> isoxmlOuterRing = isoxmlPolygon.getLineString().stream()
+            .filter((ls)-> LineStringType.POLYGONEXTERIOR.equals((ls.getLineStringType()))).findAny();
 		if( !isoxmlOuterRing.isPresent()){
 			return  null;
 		}
-		LinearRing outerRing = geometryFactory.createLinearRing();
+
+		List<LineString> isoxmlInnerRings = isoxmlPolygon.getLineString().stream()
+            .filter((ls)-> LineStringType.POLYGONINTERIOR.equals(ls.getLineStringType())).collect(Collectors.toList());
+
+        org.locationtech.jts.geom.LineString outerRing = geometryFactory.createLineString((coordinates(isoxmlOuterRing.get())));
+
+        List<org.locationtech.jts.geom.LineString> innerRings = isoxmlInnerRings.stream()
+            .map(ls -> geometryFactory.createLineString(coordinates(ls))).collect(Collectors.toList());
+
 		org.locationtech.jts.geom.Polygon jtsPolygon = new org.locationtech.jts.geom.Polygon(null, null,
 				geometryFactory);
 
