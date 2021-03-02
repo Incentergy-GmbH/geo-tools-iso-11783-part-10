@@ -42,7 +42,7 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 
 	/** Factory class for geometry creation */
 	private GeometryFactory geometryFactory;
-	
+
 	/**
 	 * Copies the first point to the last if it is not the same.
 	 *
@@ -60,7 +60,8 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 	public PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, ContentState contentState) {
 		this.taskDataFile = taskDataFile;
 		this.state = contentState;
-		builder = new SimpleFeatureBuilder(state.getFeatureType());
+		builder = new SimpleFeatureBuilder(
+				state != null ? state.getFeatureType() : new SimpleFeatureTypeBuilder().buildFeatureType());
 		geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
 	}
 

@@ -4,18 +4,14 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import static org.mockito.Mockito.mock;
-
 import java.io.IOException;
 import java.util.NoSuchElementException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import org.geotools.data.store.ContentState;
 import org.junit.jupiter.api.Test;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
@@ -27,7 +23,6 @@ class PartfieldFeatureReaderTest {
 			ISO11783TaskDataFile iSO11783TaskDataFile = (ISO11783TaskDataFile) JAXBContext
 					.newInstance(ISO11783TaskDataFile.class).createUnmarshaller()
 					.unmarshal(getClass().getResourceAsStream("/PartfieldFeatureReaderTest/TASKDATA.XML"));
-			SimpleFeatureType simpleFeatureType = PartfieldFeatureReader.buildFeatureType();
 			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(iSO11783TaskDataFile, null);
 			assertTrue(partfieldFeatureReader.hasNext());
 			SimpleFeature simpleFeature = partfieldFeatureReader.next();
