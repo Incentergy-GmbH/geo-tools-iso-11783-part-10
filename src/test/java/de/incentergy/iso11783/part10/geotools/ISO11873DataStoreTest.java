@@ -1,6 +1,7 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.Arrays;
 
@@ -21,8 +22,8 @@ class ISO11873DataStoreTest {
 	@Test
 	void testUpdateFilesFromURL() throws Exception {
         ISO11873DataStore dataStore = new ISO11873DataStore();
-        // dataStore.updateFilesFromURL(new URL('file:/'));
-        dataStore.updateFilesFromURL(getClass().getResource("/"));
-        assertEquals(Arrays.asList("TASKDATA-PartfieldFeatureReaderTest.XML"), dataStore.getTypeNames()); 
+        dataStore.updateFilesFromURL(getClass().getResource("/PartfieldFeatureReaderTest/"));
+        assertEquals(dataStore.getTypeNames().length, 1);
+        assertTrue(dataStore.getTypeNames()[0].toString().endsWith("TASKDATA.XML"));
     }
 }

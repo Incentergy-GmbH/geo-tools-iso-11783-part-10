@@ -26,7 +26,7 @@ class PartfieldFeatureReaderTest {
 		try {
 			ISO11783TaskDataFile iSO11783TaskDataFile = (ISO11783TaskDataFile) JAXBContext
 					.newInstance(ISO11783TaskDataFile.class).createUnmarshaller()
-					.unmarshal(getClass().getResourceAsStream("/TASKDATA-PartfieldFeatureReaderTest.XML"));
+					.unmarshal(getClass().getResourceAsStream("/PartfieldFeatureReaderTest/TASKDATA.XML"));
 			SimpleFeatureType simpleFeatureType = PartfieldFeatureReader.buildFeatureType();
 			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(iSO11783TaskDataFile, null);
 			assertTrue(partfieldFeatureReader.hasNext());

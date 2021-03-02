@@ -54,7 +54,9 @@ public class ISO11873DataStore extends ContentDataStore {
 			try {
 				Path path = Paths.get(url.toURI());
 				Files.list(path)
-                    .filter(consumer -> consumer.endsWith(".XML"))
+                    .filter(consumer -> {
+						return  consumer.endsWith("TASKDATA.XML");
+					})
                     .forEach((consumer) -> {
                         try {
                             files.put(consumer.toUri().toURL(),
