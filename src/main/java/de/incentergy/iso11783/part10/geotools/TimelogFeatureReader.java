@@ -5,17 +5,19 @@ import java.util.NoSuchElementException;
 
 import org.geotools.data.FeatureReader;
 import org.opengis.feature.Feature;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.FeatureType;
 
 public class TimelogFeatureReader extends AbstractFeatureReader {
 
 	@Override
-	public FeatureType getFeatureType() {
+	public SimpleFeatureType getFeatureType() {
 		return null;
 	}
 
 	@Override
-	public Feature next() throws IOException, IllegalArgumentException, NoSuchElementException {
+	public SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException {
 		return null;
 	}
 

@@ -1,6 +1,7 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -52,6 +53,21 @@ public class PartfieldFeatureReader extends AbstractFeatureReader{
             )).toArray(Coordinate[]::new);
     }
 
+
+	/**
+	 * Copies the first point to the last if it is not the same.
+	 *
+	 * @param coordinates list of coordinates
+	 */
+	private static Coordinate[] closeRing(Coordinate[] coordinates) {
+		if (!coordinates[0].equals2D(coordinates[coordinates.length-1])) {
+				coordinates = Arrays.copyOf(coordinates, coordinates.length+1);
+				coordinates[coordinates.length-1 ] = coordinates[0];
+				return coordinates;
+		}
+		return coordinates;
+	}
+
 	public org.locationtech.jts.geom.Polygon mapPolygon(Polygon isoxmlPolygon){
 		Optional<LineString> isoxmlOuterRing = isoxmlPolygon.getLineString().stream()
             .filter((ls)-> LineStringType.POLYGONEXTERIOR.equals((ls.getLineStringType()))).findAny();
@@ -62,24 +78,18 @@ public class PartfieldFeatureReader extends AbstractFeatureReader{
 		List<LineString> isoxmlInnerRings = isoxmlPolygon.getLineString().stream()
             .filter((ls)-> LineStringType.POLYGONINTERIOR.equals(ls.getLineStringType())).collect(Collectors.toList());
 
-        org.locationtech.jts.geom.LineString outerRing = geometryFactory.createLineString((coordinates(isoxmlOuterRing.get())));
+        org.locationtech.jts.geom.LinearRing outerRing = geometryFactory.createLinearRing(closeRing(coordinates(isoxmlOuterRing.get())));
 
-        List<org.locationtech.jts.geom.LineString> innerRings = isoxmlInnerRings.stream()
-            .map(ls -> geometryFactory.createLineString(coordinates(ls))).collect(Collectors.toList());
+        org.locationtech.jts.geom.LinearRing[] innerRings = isoxmlInnerRings.stream()
+            .map(ls -> geometryFactory.createLinearRing(closeRing(coordinates(ls)))).toArray(org.locationtech.jts.geom.LinearRing[]::new);
 
-		org.locationtech.jts.geom.Polygon jtsPolygon = new org.locationtech.jts.geom.Polygon(null, null,
-				geometryFactory);
+		org.locationtech.jts.geom.Polygon jtsPolygon = geometryFactory.createPolygon(outerRing,innerRings);
+		
 
-		return null;
+		return jtsPolygon;
 	}
 
 	public SimpleFeature convertPartField2SimpleFeature(Partfield partfield){
-		partfield.getPolygonNonTreatmentZoneOnly().stream().map((Polygon polygon)->{
-
-		});
-		MultiPolygon multiPolygon = new MultiPolygon(null, geometryFactory);
-
-		builder.set("polygonNonTreatmentZoneOnly", multiPolygon);
 
 		builder.set("partfieldId", partfield.getPartfieldId());
         builder.set("partfieldCode", partfield.getPartfieldCode());
@@ -100,7 +110,15 @@ public class PartfieldFeatureReader extends AbstractFeatureReader{
 		if(partfield.getFieldIdRef() instanceof Partfield){
 			builder.set("fieldIdRef", ((Partfield)partfield.getFieldIdRef()).getPartfieldId());
 		}
-		
+
+		org.locationtech.jts.geom.Polygon[] polygons = partfield.getPolygonNonTreatmentZoneOnly().stream().map((Polygon isoxmlPolygon)->{
+			return mapPolygon(isoxmlPolygon);
+		}).toArray(org.locationtech.jts.geom.Polygon[]::new);
+		MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(polygons);
+
+		builder.set("polygonNonTreatmentZoneOnly", multiPolygon);
+	
+
 		return builder.buildFeature(partfield.getPartfieldId());
 	}
 
@@ -143,12 +161,12 @@ public class PartfieldFeatureReader extends AbstractFeatureReader{
     }
 
 	@Override
-	public FeatureType getFeatureType() {
+	public SimpleFeatureType getFeatureType() {
 		return state.getFeatureType();
 	}
 
 	@Override
-	public Feature next() throws IOException, IllegalArgumentException, NoSuchElementException {
+	public SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException {
 		return null;
 	}
 
