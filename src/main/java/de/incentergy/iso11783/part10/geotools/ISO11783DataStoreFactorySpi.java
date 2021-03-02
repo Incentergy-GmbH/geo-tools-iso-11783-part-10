@@ -4,6 +4,7 @@ import java.awt.RenderingHints.Key;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -26,6 +27,16 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
                     // required
                     new KVP(Param.LEVEL, "advanced"));
 
+    public static final Param URLP =
+            new Param(
+                    "url",
+                    URL.class,
+                    "URL of files",
+                    true,
+                    null, // not
+                    // required
+                    new KVP(Param.LEVEL, "advanced"));
+
     @Override
     public String getDisplayName() {
         return "ISOXML in Memory";
@@ -38,7 +49,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 
     @Override
     public Param[] getParametersInfo() {
-        return new Param[] {NAMESPACEP};
+        return new Param[] {NAMESPACEP, URLP};
     }
 
     @Override
