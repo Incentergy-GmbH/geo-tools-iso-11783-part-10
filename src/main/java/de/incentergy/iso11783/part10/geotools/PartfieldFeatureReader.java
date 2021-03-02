@@ -33,7 +33,7 @@ import de.incentergy.iso11783.part10.v4.Polygon;
 public class PartfieldFeatureReader extends AbstractFeatureReader {
 
 	public static final String TYPE_NAME_STRING = "Partfield";
-	public static final Name TYPE_NAME = new NameImpl(PartfieldFeatureReader.class.getPackageName(), TYPE_NAME_STRING);
+	public static SimpleFeatureType FEATURE_TYPE;
 	private ISO11783TaskDataFile taskDataFile;
 	/** Utility class used to build features */
 	protected SimpleFeatureBuilder builder;
@@ -42,7 +42,7 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 
 	/** Factory class for geometry creation */
 	private GeometryFactory geometryFactory;
-
+	
 	/**
 	 * Copies the first point to the last if it is not the same.
 	 *
@@ -60,29 +60,8 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 	public PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, ContentState contentState) {
 		this.taskDataFile = taskDataFile;
 		this.state = contentState;
-		builder = new SimpleFeatureBuilder(state != null ? state.getFeatureType() : buildFeatureType());
+		builder = new SimpleFeatureBuilder(state.getFeatureType());
 		geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
-	}
-
-	public static SimpleFeatureType buildFeatureType() {
-
-		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-		builder.setName(TYPE_NAME_STRING);
-
-		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
-		builder.add("polygonNonTreatmentZoneOnly", MultiPolygon.class);
-		builder.add("partfieldId", String.class);
-		builder.add("partfieldCode", String.class);
-		builder.add("partfieldDesignator", String.class);
-		builder.add("partfieldArea", Long.class);
-		builder.add("customerIdRef", String.class);
-		builder.add("farmIdRef", String.class);
-		builder.add("cropTypeIdRef", String.class);
-		builder.add("cropVarietyIdRef", String.class);
-		builder.add("fieldIdRef", String.class);
-
-		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
-		return SCHEMA;
 	}
 
 	@Override

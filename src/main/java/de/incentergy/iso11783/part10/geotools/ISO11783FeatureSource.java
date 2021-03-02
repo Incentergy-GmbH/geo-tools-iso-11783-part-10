@@ -8,6 +8,8 @@ import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -24,29 +26,39 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected ReferencedEnvelope getBoundsInternal(Query query) throws IOException {
-		return ReferencedEnvelope.EVERYTHING;
-	}
-
-	@Override
-	protected int getCountInternal(Query query) throws IOException {
-		return 0;
-	}
-
-	@Override
-	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
-		switch(query.getTypeName()) {
-			case PartfieldFeatureReader.TYPE_NAME_STRING:
-				return new PartfieldFeatureReader(iSO11783TaskDataFile, getState());
-		}
 		return null;
 	}
 
 	@Override
+	protected int getCountInternal(Query query) throws IOException {
+		return -1;
+	}
+
+	@Override
+	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
+		return new PartfieldFeatureReader(iSO11783TaskDataFile, getState());
+	}
+
+	@Override
 	protected SimpleFeatureType buildFeatureType() throws IOException {
-//		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-// 		b.setFeatureTypeFactory( getDataStore().getFeatureTypeFactory() );
-// 		return b.buildFeatureType();
-   		return PartfieldFeatureReader.buildFeatureType();
+
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.setName(entry.getName());
+
+		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
+		builder.add("polygonNonTreatmentZoneOnly", MultiPolygon.class);
+		builder.add("partfieldId", String.class);
+		builder.add("partfieldCode", String.class);
+		builder.add("partfieldDesignator", String.class);
+		builder.add("partfieldArea", Long.class);
+		builder.add("customerIdRef", String.class);
+		builder.add("farmIdRef", String.class);
+		builder.add("cropTypeIdRef", String.class);
+		builder.add("cropVarietyIdRef", String.class);
+		builder.add("fieldIdRef", String.class);
+
+		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
+		return SCHEMA;
 	}
 
 }
