@@ -23,3 +23,14 @@
 hs_err_pid*
 
 target
+.project
+.settings/org.eclipse.core.resources.prefs
+.settings/org.eclipse.jdt.apt.core.prefs
+.settings/org.eclipse.jdt.core.prefs
+bin/.project
+bin/.settings/org.eclipse.core.resources.prefs
+.classpath
+.idea
+*.iml
+.vscode
+bin
