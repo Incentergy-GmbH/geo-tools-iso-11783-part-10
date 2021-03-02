@@ -10,7 +10,11 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
+import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
+
 public class ISO11873DataStore extends ContentDataStore {
+
+	private ISO11783TaskDataFile iSO11783TaskDataFile;
 
 	public static final List<Name> ISO11783_TYPES = Arrays.asList(
 			PartfieldFeatureReader.TYPE_NAME,
@@ -24,7 +28,7 @@ public class ISO11873DataStore extends ContentDataStore {
 
 	@Override
 	protected ContentFeatureSource createFeatureSource(ContentEntry entry) throws IOException {
-		return null;
+		return new ISO11783FeatureSource(iSO11783TaskDataFile, entry, null);
 	}
 
 }
