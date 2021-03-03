@@ -40,7 +40,16 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
-		return new PartfieldFeatureReader(iSO11783TaskZipParser.taskFile, getState());
+		if (entry.getName().getLocalPart().startsWith("Partfield")) {
+            return new PartfieldFeatureReader(iSO11783TaskZipParser.taskFile, getState());
+        } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {
+			return new TimeLogFeatureReader(iSO11783TaskZipParser.timeLogList, getState().getFeatureType());
+        } else if (entry.getName().getLocalPart().startsWith("Grid")) {
+            return new GridFeatureReader(iSO11783TaskZipParser.gridList, getState());
+        } else if (entry.getName().getLocalPart().startsWith("GuidanceLine")) {
+            return new GuidancePatternFeatureReader(iSO11783TaskZipParser.taskFile, getState());
+		}
+		return null;
 	}
 
 	@Override
