@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ISO11783_TaskData VersionMajor="4" VersionMinor="2" ManagementSoftwareManufacturer="FarmFacts" ManagementSoftwareVersion="0" DataTransferOrigin="1">
+    <CTR A="CTR1" B="Betrieb Nägelin"/>
+    <FRM A="FRM1" B="Betrieb Nägelin" I="CTR1"/>
+    <PFD A="PFD1" B="2e8696c4-d4fa-4d17-b57b-3d27d9fb" C="Bachdäu" D="3299" E="CTR1" F="FRM1">
+        <PLN A="1" C="3299">
+            <LSG A="1">
+                <PNT A="2" C="48.2416669496639" D="11.3978499357691"/>
+                <PNT A="2" C="48.24188575104613" D="11.398657463697385"/>
+                <PNT A="2" C="48.24227877277718" D="11.400108132739936"/>
+                <PNT A="2" C="48.24215603087157" D="11.400180249864405"/>
+                <PNT A="2" C="48.24175855308271" D="11.398737175399113"/>
+                <PNT A="2" C="48.24141761387076" D="11.397497402294128"/>
+                <PNT A="2" C="48.24154542733772" D="11.397404307633725"/>
+                <PNT A="2" C="48.2416669496639" D="11.3978499357691"/>
+            </LSG>
+        </PLN>
+        <GGP A="GGP1">
+            <GPN A="GPN1" B="wayline" C="1">
+                <LSG A="5" B="wayline">
+                    <PNT A="6" C="48.24159960354817" D="11.397503282415528"/>
+                    <PNT A="7" C="48.24147179065358" D="11.397596375830744"/>
+                </LSG>
+            </GPN>
+            <GPN A="GPN2" B="le wayline" C="1">
+                <LSG A="5" B="le wayline">
+                    <PNT A="6" C="48.24151565434522" D="11.397423305669008"/>
+                    <PNT A="7" C="48.24225406302071" D="11.400106140800974"/>
+                </LSG>
+            </GPN>
+        </GGP>
+    </PFD>
+</ISO11783_TaskData>

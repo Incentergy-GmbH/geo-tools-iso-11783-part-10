@@ -34,4 +34,3 @@ bin/.settings/org.eclipse.core.resources.prefs
 *.iml
 .vscode
 bin
-src/test/resources/GuidanceFeatureReaderTest/TASKDATA.xml
