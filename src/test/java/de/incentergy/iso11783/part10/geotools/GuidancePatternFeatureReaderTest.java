@@ -29,6 +29,6 @@ public class GuidancePatternFeatureReaderTest {
                 builder.buildFeatureType());
         assertTrue(guidancePatternFeatureReader.hasNext());
         SimpleFeature simpleFeature = guidancePatternFeatureReader.next();
-        assertEquals(2, guidancePatternFeatureReader.count());
+        assertEquals(2, guidancePatternFeatureReader.countGuidancePatterns());
     }
 }

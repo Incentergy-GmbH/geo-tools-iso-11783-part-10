@@ -114,7 +114,7 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 	}
 
 
-	public int count(){
+	public int countGuidancePatterns(){
 		return this.guidancePatterns.size();
 	}
 
