@@ -68,11 +68,11 @@
         </PLN>
     </PFD>
     <PDT A="PDT-1" B="Saatgut Mais - ES Eurojet"/>
-    <TSK A="TSK-1" B="Gen 2021-03-02T08:16:47Z" C="CTR-1" E="PFD-1" G="4">
-        <TIM A="2021-03-02T08:16:47Z" D="4"/>
+    <TSK A="TSK-1" B="Gen 2021-03-03T08:28:59Z" C="CTR-1" E="PFD-1" G="4">
+        <TIM A="2021-03-03T08:28:59Z" D="4"/>
         <OTP A="CPC-1" B="OTQ-1"/>
         <DAN C="DVC-1">
-            <ASP A="2021-03-02T08:16:47Z" B="2021-03-03T02:46:40Z"/>
+            <ASP A="2021-03-03T08:28:59Z" B="2021-03-04T00:46:40Z"/>
         </DAN>
         <TLG A="TLG00001" C="1"/>
     </TSK>

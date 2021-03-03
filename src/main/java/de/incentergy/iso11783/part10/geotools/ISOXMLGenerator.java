@@ -67,7 +67,7 @@ public class ISOXMLGenerator {
 	}
 
 	public static void main(String[] args) throws JAXBException, IOException, DatatypeConfigurationException {
-		for (int sampleCount : Arrays.asList(1000)) {
+		for (int sampleCount : Arrays.asList(100000)) {
 			ISO11783TaskDataFile iso11783TaskData = new ISO11783TaskDataFile();
 			iso11783TaskData.setManagementSoftwareManufacturer(ISOXMLGenerator.class.getSimpleName());
 
@@ -173,6 +173,12 @@ public class ISOXMLGenerator {
 			if (!dir.exists()) {
 				dir.mkdir();
 			}
+
+			File internalDir = new File("src/test/resources/ISOXMLGenerator-" + sampleCount + "/TASKDATA");
+			if (!internalDir.exists()) {
+				internalDir.mkdir();
+			}
+
 			generateTimeLogXmlFile(timelogFilename, sampleCount);
 			Date stopDate = generateTimeLogBinFile(now, timelogFilename, sampleCount);
 
@@ -185,13 +191,13 @@ public class ISOXMLGenerator {
 			Marshaller marshaller = jaxbContext.createMarshaller();
 			marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			marshaller.marshal(iso11783TaskData,
-					new FileOutputStream("src/test/resources/ISOXMLGenerator-" + sampleCount + "/TASKDATA.XML"));
+					new FileOutputStream("src/test/resources/ISOXMLGenerator-" + sampleCount + "/TASKDATA/TASKDATA.XML"));
 
 			FileOutputStream fos = new FileOutputStream(
 					"src/test/resources/ISOXMLGenerator-" + sampleCount + "/Taskdata-" + sampleCount + ".zip");
 			ZipOutputStream zos = new ZipOutputStream(fos);
 
-			for (String fileName : Arrays.asList("TASKDATA.XML", timelogFilename + ".BIN", timelogFilename + ".XML")) {
+			for (String fileName : Arrays.asList("TASKDATA/TASKDATA.XML", "TASKDATA/" + timelogFilename + ".BIN", "TASKDATA/" + timelogFilename + ".XML")) {
 				addToZipFile("src/test/resources/ISOXMLGenerator-" + sampleCount + "/", fileName, zos);
 			}
 
@@ -580,7 +586,7 @@ public class ISOXMLGenerator {
 				isoXmlTimeLogBin.putInt(ThreadLocalRandom.current().nextInt(5, 21));
 			}
 
-			Files.write(Paths.get("src/test/resources/ISOXMLGenerator-" + sampleCount + "/" + timelogFilename + ".BIN"),
+			Files.write(Paths.get("src/test/resources/ISOXMLGenerator-" + sampleCount + "/TASKDATA/" + timelogFilename + ".BIN"),
 					isoXmlTimeLogBin.array());
 
 		} catch (IOException e) {
@@ -593,7 +599,7 @@ public class ISOXMLGenerator {
 
 	private static void generateTimeLogXmlFile(String timelogFilename, int sampleCount) {
 		try {
-			Files.write(Paths.get("src/test/resources/ISOXMLGenerator-" + sampleCount + "/" + timelogFilename + ".XML"),
+			Files.write(Paths.get("src/test/resources/ISOXMLGenerator-" + sampleCount + "/TASKDATA/" + timelogFilename + ".XML"),
 					("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>\n" + "<TIM A=\"\" D=\"4\">\n"
 							+ " <PTN A=\"\" B=\"\" />\n"
 							+ " <!-- 84 - Mass Per Area Yield mg/m² --><DLV A=\"0054\" B=\"\" C=\"DET-1\" />\n"
