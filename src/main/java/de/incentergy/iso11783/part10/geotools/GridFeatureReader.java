@@ -54,7 +54,7 @@ public class GridFeatureReader extends AbstractFeatureReader {
 
 	@Override
 	public boolean hasNext() throws IOException {
-		return index > gridEntries.size();
+		return index < gridEntries.size();
 	}
 
 	@Override
