@@ -43,16 +43,16 @@ public class ISO11873DataStore extends ContentDataStore {
 	@Override
 	protected List<Name> createTypeNames() throws IOException {
 		return files.keySet().stream().flatMap(url -> Stream.of(
-            new NameImpl(url.toString(), "Partfield"),
-            new NameImpl(url.toString(), "TimeLog"),
-			new NameImpl(url.toString(), "Grid"),
-			new NameImpl(url.toString(), "GuidancePattern")
+            new NameImpl("Partfield_" + url.toString()),
+            new NameImpl("TimeLog_" + url.toString()),
+			new NameImpl("Grid_" + url.toString()),
+			new NameImpl("GuidancePattern_" + url.toString())
         )).collect(Collectors.toList());
 	}
 
 	@Override
 	protected ContentFeatureSource createFeatureSource(ContentEntry entry) throws IOException {
-		return new ISO11783FeatureSource(files.get(new URL(entry.getName().getLocalPart())), entry, Query.ALL);
+		return new ISO11783FeatureSource(files.get(new URL(entry.getName().getNamespaceURI())), entry, Query.ALL);
 	}
 
 	public void updateFilesFromURL(URL url){

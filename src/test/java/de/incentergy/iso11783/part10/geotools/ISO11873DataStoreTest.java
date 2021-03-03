@@ -24,6 +24,6 @@ class ISO11873DataStoreTest {
         ISO11873DataStore dataStore = new ISO11873DataStore();
         dataStore.updateFilesFromURL(getClass().getResource("/ISOXMLGenerator-100/"));
         assertEquals(4, dataStore.getTypeNames().length);
-        assertTrue(dataStore.getTypeNames()[0].endsWith("Partfield"));
+        assertTrue(dataStore.getTypeNames()[0].startsWith("Partfield"));
     }
 }

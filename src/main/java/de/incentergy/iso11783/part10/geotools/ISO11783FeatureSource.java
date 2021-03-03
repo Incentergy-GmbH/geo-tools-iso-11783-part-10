@@ -48,22 +48,17 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(entry.getName());
-		switch (entry.getName().getLocalPart()) {
-			case "Partfield":
-				addAttributesForPartfield(builder);
-				break;
-			case "TimeLog":
-				addAttributesForTimeLog(builder, iSO11783TaskZipParser);
-				break;
-			case "Grid":
-				addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
-				break;
-			case "GuidancePattern":
-				addAttributesForGuidancePattern(builder);
-				break;		}
+        if (entry.getName().getLocalPart().startsWith("Partfield")) {
+            addAttributesForPartfield(builder);
+        } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {
+            addAttributesForTimeLog(builder, iSO11783TaskZipParser);
+        } else if (entry.getName().getLocalPart().startsWith("Grid")) {
+            addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
+        } else if (entry.getName().getLocalPart().startsWith("GuidanceLine")) {
+            addAttributesForGuidancePattern(builder);
+        }
 
-		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
-		return SCHEMA;
+		return builder.buildFeatureType();
 	}
 
 	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder, ISO11783TaskZipParser iSO11783TaskZipParser) {
