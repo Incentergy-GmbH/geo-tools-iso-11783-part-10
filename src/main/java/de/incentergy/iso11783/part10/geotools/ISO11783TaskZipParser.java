@@ -39,15 +39,17 @@ public class ISO11783TaskZipParser {
     Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
 
     public ISO11783TaskZipParser(URL url) {
-        try {
-            ZipInputStream zipStream = new ZipInputStream(url.openStream());
+        try (ZipInputStream zipStream = new ZipInputStream(url.openStream())) {
             ZipEntry entry;
             while ((entry = zipStream.getNextEntry()) != null) {
                 if (entry.isDirectory() == false) {
                     String upperName = entry.getName().toUpperCase();
                     if (upperName.endsWith("TASKDATA.XML")) {
+                        ByteArrayOutputStream boas = new ByteArrayOutputStream();
+                        zipStream.transferTo(boas);
+                        ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
                         this.taskFile = (ISO11783TaskDataFile) ISO11873DataStore.jaxbContext.createUnmarshaller()
-                                .unmarshal(zipStream);
+                                .unmarshal(bais);
                     } else if(TLG_BIN_PATTERN.matcher(upperName).matches()) {
                         ByteArrayOutputStream boas = new ByteArrayOutputStream();
                         zipStream.transferTo(boas);
@@ -59,9 +61,10 @@ public class ISO11783TaskZipParser {
                         ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
                         timeLogXmlFiles.put(upperName, bais);
                         Map<String, Boolean> structure = createStructureMap(bais);
-
+                        log.info(structure.toString());
                     }
                 }
+                zipStream.closeEntry();
             }
         } catch (IOException | JAXBException e) {
             e.printStackTrace();
