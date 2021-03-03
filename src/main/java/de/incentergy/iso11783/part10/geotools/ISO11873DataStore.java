@@ -29,7 +29,7 @@ public class ISO11873DataStore extends ContentDataStore {
 	
 	private Map<URL, ISO11783TaskDataFile> files = new ConcurrentHashMap<>();
 
-	private static JAXBContext jaxbContext;
+	static JAXBContext jaxbContext;
 
 	static {
 		try {
