@@ -53,7 +53,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 				addAttributesForPartfield(builder);
 				break;
 			case "TimeLog":
-				addAttributesForTimeLog(builder, entry);
+				addAttributesForTimeLog(builder, iSO11783TaskZipParser);
 				break;
 			case "Grid":
 				addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
