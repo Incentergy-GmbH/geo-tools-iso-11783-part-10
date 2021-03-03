@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -55,8 +56,12 @@ public class ISO11873DataStore extends ContentDataStore {
 
 	@Override
 	protected ContentFeatureSource createFeatureSource(ContentEntry entry) throws IOException {
-        String filename = EXTRACT_FILENAME.matcher(entry.getName().getLocalPart()).group(1);
-		return new ISO11783FeatureSource(files.get(filename), entry, Query.ALL);
+        Matcher matcher = EXTRACT_FILENAME.matcher(entry.getName().getLocalPart());
+        if (matcher.matches()) {
+            return new ISO11783FeatureSource(files.get(matcher.group(1)), entry, Query.ALL);
+        }
+
+        return null;
 	}
 
 	public void updateFilesFromURL(URL url){
@@ -69,8 +74,8 @@ public class ISO11873DataStore extends ContentDataStore {
 					})
                     .forEach((consumer) -> {
                         try {
-                            files.put(consumer.getFileName().toString(),
-                                    new ISO11783TaskZipParser(consumer.toFile().toURL()));
+                            files.put(consumer.toString(),
+                                    new ISO11783TaskZipParser(consumer.toUri().toURL()));
                         } catch (MalformedURLException e) {
                             e.printStackTrace();
                         }
