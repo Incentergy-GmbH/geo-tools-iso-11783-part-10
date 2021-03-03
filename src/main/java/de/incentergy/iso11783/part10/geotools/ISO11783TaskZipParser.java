@@ -5,6 +5,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.nio.ByteBuffer;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,6 +15,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -27,16 +30,18 @@ import javax.xml.stream.events.XMLEvent;
 import org.apache.commons.lang3.ObjectUtils.Null;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
+import de.incentergy.iso11783.part10.v4.TimeLog;
 
 public class ISO11783TaskZipParser {
     ISO11783TaskDataFile taskFile;
     private static Logger log = Logger.getLogger(ISO11783TaskZipParser.class.getName());
-    private Map<String, InputStream> timeLogBinFiles = new HashMap<>();
-    private Map<String, InputStream> timeLogXmlFiles = new HashMap<>();
-    private Map<String, InputStream> gridBinFiles = new HashMap<>();
+    private Map<String, byte[]> timeLogBinFiles = new HashMap<>();
+    private Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
+    private Map<String, byte[]> gridBinFiles = new HashMap<>();
 
     Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
     Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
+    private List<TimeLogFileData>  timeLogList;
 
     public ISO11783TaskZipParser(URL url) {
         try (ZipInputStream zipStream = new ZipInputStream(url.openStream())) {
@@ -44,70 +49,43 @@ public class ISO11783TaskZipParser {
             while ((entry = zipStream.getNextEntry()) != null) {
                 if (entry.isDirectory() == false) {
                     String upperName = entry.getName().toUpperCase();
+                    String fileName = Path.of(upperName).getFileName().toString();
                     if (upperName.endsWith("TASKDATA.XML")) {
                         ByteArrayOutputStream boas = new ByteArrayOutputStream();
                         zipStream.transferTo(boas);
                         ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
                         this.taskFile = (ISO11783TaskDataFile) ISO11873DataStore.jaxbContext.createUnmarshaller()
                                 .unmarshal(bais);
-                    } else if(TLG_BIN_PATTERN.matcher(upperName).matches()) {
+                    } else if(TLG_BIN_PATTERN.matcher(Path.of(upperName).getFileName().toString()).matches()) {
                         ByteArrayOutputStream boas = new ByteArrayOutputStream();
                         zipStream.transferTo(boas);
-                        ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
-                        timeLogBinFiles.put(upperName, bais);
+                        timeLogBinFiles.put(fileName, boas.toByteArray());
                     } else if(TLG_XML_PATTERN.matcher(upperName).matches()) {
                         ByteArrayOutputStream boas = new ByteArrayOutputStream();
                         zipStream.transferTo(boas);
-                        ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
-                        timeLogXmlFiles.put(upperName, bais);
-                        Map<String, Boolean> structure = createStructureMap(bais);
-                        log.info(structure.toString());
+                        timeLogXmlFiles.put(fileName, boas.toByteArray());
                     }
                 }
                 zipStream.closeEntry();
             }
+
+
+            List<TimeLog> taskDataTimeLogList = this.taskFile.getTask().stream().flatMap((task)->task.getTimeLog().stream()).collect(Collectors.toList());
+            this.timeLogList = new ArrayList<>();
+            for( TimeLog timeLogEntry: taskDataTimeLogList){
+                byte[] tlgXML = timeLogXmlFiles.get(timeLogEntry.getFilename() + ".XML");
+                byte[] tlgBIN = timeLogBinFiles.get(timeLogEntry.getFilename() + ".BIN");
+                if( (tlgXML!=null) && (tlgBIN!=null)){
+                    this.timeLogList.add(new TimeLogFileData(this.taskFile,timeLogEntry,tlgXML, tlgBIN));
+
+                }
+            }
+
+
+
+
         } catch (IOException | JAXBException e) {
             e.printStackTrace();
         }
-    }
-
-            /**
-         * Creates a structure map from an InputStream that was created from a TimeLog
-         * description file.
-         *
-         * @param timeLogXmlInputStream
-         * @return
-         */
-        private Map<String, Boolean> createStructureMap(InputStream timeLogXmlInputStream) {
-            Map<String, Boolean> map = new HashMap<>();
-            XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-            try {
-                    XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(timeLogXmlInputStream);
-                    while (xmlEventReader.hasNext()) {
-                            XMLEvent xmlEvent = xmlEventReader.nextEvent();
-                            if (xmlEvent.isStartElement()) {
-                                    checkStartElementAndAddToMap(map, xmlEvent);
-                            }
-                    }
-
-            } catch (XMLStreamException e) {
-                    log.log(Level.SEVERE, "Can't create structure map", e);
-            }
-            return map;
-    }
-
-    private void checkStartElementAndAddToMap(Map<String, Boolean> map, XMLEvent xmlEvent) {
-            StartElement startElement = xmlEvent.asStartElement();
-            if (startElement.getName().getLocalPart().equals("PTN")) {
-
-                    @SuppressWarnings("unchecked")
-                    Iterator<Attribute> it = startElement.getAttributes();
-                    while (it.hasNext()) {
-                            Attribute attribute = it.next();
-                            if ("".equals(attribute.getValue())) {
-                                    map.put("PNT-" + attribute.getName().getLocalPart(), true);
-                            }
-                    }
-            }
     }
 }
