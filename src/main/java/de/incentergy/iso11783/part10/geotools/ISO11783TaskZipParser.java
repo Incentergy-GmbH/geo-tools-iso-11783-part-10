@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
@@ -29,6 +30,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.commons.lang3.ObjectUtils.Null;
 
+import de.incentergy.iso11783.part10.v4.Grid;
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import de.incentergy.iso11783.part10.v4.TimeLog;
 
@@ -40,8 +42,10 @@ public class ISO11783TaskZipParser {
     Map<String, byte[]> gridBinFiles = new HashMap<>();
 
     Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
+    Pattern GRD_BIN_PATTERN = Pattern.compile(".*GRD[0-9]+\\.BIN$");
     Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
-    List<TimeLogFileData>  timeLogList;
+    List<TimeLogFileData> timeLogList = new ArrayList<>();
+    List<GridFileData> gridList = new ArrayList<>();
 
     public ISO11783TaskZipParser(URL url) {
         try (ZipInputStream zipStream = new ZipInputStream(url.openStream())) {
@@ -50,32 +54,37 @@ public class ISO11783TaskZipParser {
                 if (entry.isDirectory() == false) {
                     String upperName = entry.getName().toUpperCase();
                     String fileName = Path.of(upperName).getFileName().toString();
+                    ByteArrayOutputStream boas = new ByteArrayOutputStream();
+                    zipStream.transferTo(boas);
                     if (upperName.endsWith("TASKDATA.XML")) {
-                        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-                        zipStream.transferTo(boas);
                         ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
                         this.taskFile = (ISO11783TaskDataFile) ISO11873DataStore.jaxbContext.createUnmarshaller()
                                 .unmarshal(bais);
                     } else if(TLG_BIN_PATTERN.matcher(Path.of(upperName).getFileName().toString()).matches()) {
-                        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-                        zipStream.transferTo(boas);
                         timeLogBinFiles.put(fileName, boas.toByteArray());
                     } else if(TLG_XML_PATTERN.matcher(upperName).matches()) {
-                        ByteArrayOutputStream boas = new ByteArrayOutputStream();
-                        zipStream.transferTo(boas);
                         timeLogXmlFiles.put(fileName, boas.toByteArray());
+                    } else if(GRD_BIN_PATTERN.matcher(upperName).matches()) {
+                        gridBinFiles.put(fileName, boas.toByteArray());
                     }
                 }
                 zipStream.closeEntry();
             }
 
             List<TimeLog> taskDataTimeLogList = this.taskFile.getTask().stream().flatMap((task)->task.getTimeLog().stream()).collect(Collectors.toList());
-            this.timeLogList = new ArrayList<>();
             for( TimeLog timeLogEntry: taskDataTimeLogList){
                 byte[] tlgXML = timeLogXmlFiles.get(timeLogEntry.getFilename() + ".XML");
                 byte[] tlgBIN = timeLogBinFiles.get(timeLogEntry.getFilename() + ".BIN");
                 if( (tlgXML!=null) && (tlgBIN!=null)){
                     this.timeLogList.add(new TimeLogFileData(this.taskFile,timeLogEntry,tlgXML, tlgBIN));
+                }
+            }
+
+            List<Grid> gridFileDataList = this.taskFile.getTask().stream().map((task)->task.getGrid()).filter(Objects::nonNull).collect(Collectors.toList());
+            for( Grid gridEntry: gridFileDataList){
+                byte[] gridBIN = gridBinFiles.get(gridEntry.getFilename() + ".BIN");
+                if(gridBIN != null){
+                    this.gridList.add(new GridFileData(gridEntry, gridBIN));
                 }
             }
 

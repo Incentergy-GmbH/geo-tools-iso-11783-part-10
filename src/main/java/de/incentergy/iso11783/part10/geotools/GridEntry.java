@@ -2,13 +2,9 @@ package de.incentergy.iso11783.part10.geotools;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 public class GridEntry {
-
-	private UUID id = java.util.UUID.randomUUID();
 
 	private org.locationtech.jts.geom.Point point;
 
@@ -19,15 +15,6 @@ public class GridEntry {
 		super();
 	}
 
-	public UUID getId() {
-		return id;
-	}
-
-	public void setId(UUID id) {
-		this.id = id;
-	}
-
-	@XmlJavaTypeAdapter(GeometryAdapter.class)
 	public org.locationtech.jts.geom.Point getPoint() {
 		return point;
 	}

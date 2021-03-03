@@ -12,6 +12,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.MultiPolygon;
+import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -47,12 +48,17 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(entry.getName());
 
-        switch(entry.getName().getLocalPart()) {
-            case "Partfield":
-                addAttributesForPartfield(builder);
-            case "TimeLog":
-                addAttributesForTimeLog(builder, iSO11783TaskZipParser);
-        }
+		switch (entry.getName().getLocalPart()) {
+			case "Partfield":
+				addAttributesForPartfield(builder);
+				break;
+			case "TimeLog":
+				addAttributesForTimeLog(builder, entry);
+				break;
+			case "Grid":
+				addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
+				break;
+		}
 
 		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
 		return SCHEMA;
@@ -78,6 +84,19 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
             builder.add("DDI" + num, Integer.class);
         });
     }
+
+	static void addAttributesForGrid(SimpleFeatureTypeBuilder builder, List<GridFileData> gridList) {
+		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
+
+		builder.add("point", Point.class);
+
+		int maxEntriesForGrids = gridList.stream().mapToInt(gridFileData -> gridFileData.getGridEntries().stream()
+				.mapToInt(gridEntry -> gridEntry.getValues().size()).max().orElse(0)).max().orElse(0);
+		for (int i = 0; i < maxEntriesForGrids; i++) {
+			builder.add("value-" + (i + 1), Integer.class);
+		}
+
+	}
 
 	static void addAttributesForPartfield(SimpleFeatureTypeBuilder builder) {
 		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
