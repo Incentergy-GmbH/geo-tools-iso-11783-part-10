@@ -42,6 +42,7 @@ public class ISO11783TaskZipParser {
     Map<String, byte[]> gridBinFiles = new HashMap<>();
 
     Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
+    Pattern GRD_BIN_PATTERN = Pattern.compile(".*GRD[0-9]+\\.BIN$");
     Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
     List<TimeLogFileData> timeLogList = new ArrayList<>();
     List<GridFileData> gridList = new ArrayList<>();
@@ -63,13 +64,14 @@ public class ISO11783TaskZipParser {
                         timeLogBinFiles.put(fileName, boas.toByteArray());
                     } else if(TLG_XML_PATTERN.matcher(upperName).matches()) {
                         timeLogXmlFiles.put(fileName, boas.toByteArray());
+                    } else if(GRD_BIN_PATTERN.matcher(upperName).matches()) {
+                        gridBinFiles.put(fileName, boas.toByteArray());
                     }
                 }
                 zipStream.closeEntry();
             }
 
             List<TimeLog> taskDataTimeLogList = this.taskFile.getTask().stream().flatMap((task)->task.getTimeLog().stream()).collect(Collectors.toList());
-            this.timeLogList = new ArrayList<>();
             for( TimeLog timeLogEntry: taskDataTimeLogList){
                 byte[] tlgXML = timeLogXmlFiles.get(timeLogEntry.getFilename() + ".XML");
                 byte[] tlgBIN = timeLogBinFiles.get(timeLogEntry.getFilename() + ".BIN");
@@ -78,13 +80,11 @@ public class ISO11783TaskZipParser {
                 }
             }
 
-            List<Grid> gridList = this.taskFile.getTask().stream().map((task)->task.getGrid()).filter(Objects::nonNull).collect(Collectors.toList());
-            this.timeLogList = new ArrayList<>();
-            for( TimeLog timeLogEntry: taskDataTimeLogList){
-                byte[] tlgXML = timeLogXmlFiles.get(timeLogEntry.getFilename() + ".XML");
-                byte[] tlgBIN = timeLogBinFiles.get(timeLogEntry.getFilename() + ".BIN");
-                if( (tlgXML!=null) && (tlgBIN!=null)){
-                    this.timeLogList.add(new TimeLogFileData(this.taskFile,timeLogEntry,tlgXML, tlgBIN));
+            List<Grid> gridFileDataList = this.taskFile.getTask().stream().map((task)->task.getGrid()).filter(Objects::nonNull).collect(Collectors.toList());
+            for( Grid gridEntry: gridFileDataList){
+                byte[] gridBIN = gridBinFiles.get(gridEntry.getFilename() + ".BIN");
+                if(gridBIN != null){
+                    this.gridList.add(new GridFileData(gridEntry, gridBIN));
                 }
             }
 

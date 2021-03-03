@@ -4,7 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
 
@@ -18,9 +17,6 @@ import de.incentergy.iso11783.part10.v4.GridType;
 public class GridFileData {
 
 	private static final Logger log = Logger.getLogger(GridFileData.class.getName());
-
-	private UUID id = java.util.UUID.randomUUID();
-
 	private byte[] binFile;
 
 	private List<GridEntry> gridEntries = new ArrayList<>();
@@ -38,14 +34,6 @@ public class GridFileData {
 		setGrid(grid);
 		setBinFile(binFile);
 		parseGrid();
-	}
-
-	public UUID getId() {
-		return id;
-	}
-
-	public void setId(UUID id) {
-		this.id = id;
 	}
 
 	public byte[] getBinFile() {

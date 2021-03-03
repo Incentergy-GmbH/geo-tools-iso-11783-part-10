@@ -23,7 +23,7 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
         this.timeLogList = timeLogList;
     }
 
-    private convertTimeLog2SimpleFeature(Time time) {
+    /*private convertTimeLog2SimpleFeature(Time time) {
         time.getDataLogValue().stream().forEach(logValue -> {
             ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
             long num = wrapped.getLong();
@@ -31,7 +31,7 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
         })
 
         return builder.buildFeature()
-    }
+    }*/
 
 	@Override
 	public SimpleFeatureType getFeatureType() {
