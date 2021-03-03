@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -28,7 +29,9 @@ import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11873DataStore extends ContentDataStore {
 	
-	private Map<URL, ISO11783TaskZipParser> files = new ConcurrentHashMap<>();
+	private Map<String, ISO11783TaskZipParser> files = new ConcurrentHashMap<>();
+
+    Pattern EXTRACT_FILENAME = Pattern.compile("[^_]+_(.*)$");
 
 	static JAXBContext jaxbContext;
 
@@ -42,17 +45,18 @@ public class ISO11873DataStore extends ContentDataStore {
 
 	@Override
 	protected List<Name> createTypeNames() throws IOException {
-		return files.keySet().stream().flatMap(url -> Stream.of(
-            new NameImpl("Partfield_" + url.toString()),
-            new NameImpl("TimeLog_" + url.toString()),
-			new NameImpl("Grid_" + url.toString()),
-			new NameImpl("GuidancePattern_" + url.toString())
+		return files.keySet().stream().flatMap(filename -> Stream.of(
+            new NameImpl("Partfield_" + filename.toString()),
+            new NameImpl("TimeLog_" + filename.toString()),
+			new NameImpl("Grid_" + filename.toString()),
+			new NameImpl("GuidancePattern_" + filename.toString())
         )).collect(Collectors.toList());
 	}
 
 	@Override
 	protected ContentFeatureSource createFeatureSource(ContentEntry entry) throws IOException {
-		return new ISO11783FeatureSource(files.get(new URL(entry.getName().getNamespaceURI())), entry, Query.ALL);
+        String filename = EXTRACT_FILENAME.matcher(entry.getName().getLocalPart()).group(1);
+		return new ISO11783FeatureSource(files.get(filename), entry, Query.ALL);
 	}
 
 	public void updateFilesFromURL(URL url){
@@ -65,7 +69,7 @@ public class ISO11873DataStore extends ContentDataStore {
 					})
                     .forEach((consumer) -> {
                         try {
-                            files.put(consumer.toUri().toURL(),
+                            files.put(consumer.getFileName().toString(),
                                     new ISO11783TaskZipParser(consumer.toFile().toURL()));
                         } catch (MalformedURLException e) {
                             e.printStackTrace();
