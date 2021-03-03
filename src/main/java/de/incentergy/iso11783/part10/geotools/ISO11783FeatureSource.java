@@ -46,7 +46,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 			return new TimeLogFeatureReader(iSO11783TaskZipParser.timeLogList, getState().getFeatureType());
         } else if (entry.getName().getLocalPart().startsWith("Grid")) {
             return new GridFeatureReader(iSO11783TaskZipParser.gridList, getState());
-        } else if (entry.getName().getLocalPart().startsWith("GuidanceLine")) {
+        } else if (entry.getName().getLocalPart().startsWith("GuidancePattern")) {
             return new GuidancePatternFeatureReader(iSO11783TaskZipParser.taskFile, getState());
 		}
 		return null;
@@ -63,7 +63,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
             addAttributesForTimeLog(builder, iSO11783TaskZipParser);
         } else if (entry.getName().getLocalPart().startsWith("Grid")) {
             addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
-        } else if (entry.getName().getLocalPart().startsWith("GuidanceLine")) {
+        } else if (entry.getName().getLocalPart().startsWith("GuidancePattern")) {
             addAttributesForGuidancePattern(builder);
         }
 
