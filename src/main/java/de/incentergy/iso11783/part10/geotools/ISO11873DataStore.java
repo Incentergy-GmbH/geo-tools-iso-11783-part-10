@@ -44,7 +44,8 @@ public class ISO11873DataStore extends ContentDataStore {
 	protected List<Name> createTypeNames() throws IOException {
 		return files.keySet().stream().flatMap(url -> Stream.of(
             new NameImpl(url.toString(), "Partfield"),
-            new NameImpl(url.toString(), "TimeLog")
+            new NameImpl(url.toString(), "TimeLog"),
+			new NameImpl(url.toString(), "GuidancePattern")
         )).collect(Collectors.toList());
 	}
 

@@ -9,6 +9,7 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
@@ -46,15 +47,20 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
         switch(entry.getName().getLocalPart()) {
             case "Partfield":
                 addAttributesForPartfield(builder);
+				break;
             case "TimeLog":
                 addAttributesForTimeLog(builder);
+				break;
+			case "GuidanceLine":
+				addAttributesForGuidancePattern(builder);
+				break;
         }
 
 		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
 		return SCHEMA;
 	}
 
-	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder, ContentEntry entry) {
+	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder) {
 		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
 
         // byte[] iSO11783TaskZipParser.timeLogXmlFiles[entry.getName().getNamespaceURI()]
@@ -74,4 +80,12 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 		builder.add("fieldIdRef", String.class);
 	}
 
+
+	static void addAttributesForGuidancePattern(SimpleFeatureTypeBuilder builder) {
+		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
+		builder.add("guidancePatternId", String.class);
+		builder.add("guidancePatternDesignator", String.class);
+		builder.add("guidancePatternType", String.class);
+		builder.add("guidanceLine", LineString.class);
+	}
 }
