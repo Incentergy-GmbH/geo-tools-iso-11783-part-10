@@ -83,6 +83,8 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
         if (times.size() == 0) {
             return;
         }
+        
+        builder.add("position", Point.class);
 
         times.get(0).getDataLogValue().stream().forEach(logValue -> {
             ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
