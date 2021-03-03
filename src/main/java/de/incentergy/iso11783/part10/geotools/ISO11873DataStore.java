@@ -7,10 +7,12 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -40,7 +42,10 @@ public class ISO11873DataStore extends ContentDataStore {
 
 	@Override
 	protected List<Name> createTypeNames() throws IOException {
-		return files.keySet().stream().map(url -> new NameImpl(url.toString())).collect(Collectors.toList());
+		return files.keySet().stream().flatMap(url -> Stream.of(
+            new NameImpl(url.toString(), "Partfield"),
+            new NameImpl(url.toString(), "TimeLog")
+        )).collect(Collectors.toList());
 	}
 
 	@Override
