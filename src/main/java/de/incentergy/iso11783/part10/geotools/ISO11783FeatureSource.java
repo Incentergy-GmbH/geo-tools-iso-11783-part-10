@@ -13,15 +13,13 @@ import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
-import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
-
 public class ISO11783FeatureSource extends ContentFeatureSource {
 
-	private ISO11783TaskDataFile iSO11783TaskDataFile;
+	private ISO11783TaskZipParser iSO11783TaskZipParser;
 
 	public ISO11783FeatureSource(ISO11783TaskZipParser iSO11783TaskZipParser, ContentEntry entry, Query query) {
 		super(entry, query);
-		this.iSO11783TaskDataFile = iSO11783TaskZipParser.taskFile;
+		this.iSO11783TaskZipParser = iSO11783TaskZipParser;
 	}
 
 	@Override
@@ -36,7 +34,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
-		return new PartfieldFeatureReader(iSO11783TaskDataFile, getState());
+		return new PartfieldFeatureReader(iSO11783TaskZipParser.taskFile, getState());
 	}
 
 	@Override
@@ -45,11 +43,22 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(entry.getName());
 
-		addAttributesForPartfield(builder);
+        switch(entry.getName().getLocalPart()) {
+            case "Partfield":
+                addAttributesForPartfield(builder);
+            case "TimeLog":
+                addAttributesForTimeLog(builder);
+        }
 
 		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
 		return SCHEMA;
 	}
+
+	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder, ContentEntry entry) {
+		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
+
+        // byte[] iSO11783TaskZipParser.timeLogXmlFiles[entry.getName().getNamespaceURI()]
+    }
 
 	static void addAttributesForPartfield(SimpleFeatureTypeBuilder builder) {
 		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system

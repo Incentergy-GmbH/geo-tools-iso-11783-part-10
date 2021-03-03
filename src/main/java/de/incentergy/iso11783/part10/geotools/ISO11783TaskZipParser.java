@@ -37,9 +37,9 @@ import de.incentergy.iso11783.part10.v4.TimeLog;
 public class ISO11783TaskZipParser {
     ISO11783TaskDataFile taskFile;
     private static Logger log = Logger.getLogger(ISO11783TaskZipParser.class.getName());
-    private Map<String, byte[]> timeLogBinFiles = new HashMap<>();
-    private Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
-    private Map<String, byte[]> gridBinFiles = new HashMap<>();
+    Map<String, byte[]> timeLogBinFiles = new HashMap<>();
+    Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
+    Map<String, byte[]> gridBinFiles = new HashMap<>();
 
     Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
     Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
