@@ -97,6 +97,7 @@ public class TimeLogFileData {
         setBinFile(binFile);
         setXmlFile(xmlFile);
         setTimeLog(timeLog);
+        convertTimeLogFileToTimeLogData();
     }
 
     public UUID getId() {
@@ -172,7 +173,7 @@ public class TimeLogFileData {
         Map<String, Boolean> structureMap = createStructureMap(new ByteArrayInputStream(getXmlFile()));
         Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = jaxbContext.createUnmarshaller();
+            unmarshaller = ISO11873DataStore.jaxbContext.createUnmarshaller();
         } catch (JAXBException e) {
             log.warning("could not create JAXBContext");
         }

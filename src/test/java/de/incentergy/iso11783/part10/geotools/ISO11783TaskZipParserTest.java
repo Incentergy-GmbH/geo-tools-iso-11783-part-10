@@ -1,30 +1,22 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
-import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
 import org.junit.jupiter.api.Test;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11783TaskZipParserTest {
-    private ISO11783TaskDataFile taskFile;
-    private List<InputStream> logFiles;
-    private List<InputStream> gridFiles;
-
 
     @Test
     void testLoadZipFolderFromGeneratorWith100000Elements(){
-        URL url = getClass().getResource("/ISOXMLGenerator-100000/Taskdata-100000.zip");
+        URL url = getClass().getResource("/ISOXMLGenerator-100/Taskdata-100.zip");
         ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
         assertNotNull(taskZipParser.taskFile);
+        assertEquals(100, taskZipParser.timeLogList.get(0).getTimes().size());
     }
 
     @Test

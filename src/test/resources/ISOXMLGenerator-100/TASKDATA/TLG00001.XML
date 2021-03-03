@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TIM A="" D="4">
+ <PTN A="" B="" />
+ <!-- 84 - Mass Per Area Yield mg/m² --><DLV A="0054" B="" C="DET-1" />
+ <!-- 149 - Fuel consumption per time mm³/s --><DLV A="0095" B="" C="DET-1" />
+ <!-- 192 - Ambient temperature mK --><DLV A="00C0" B="" C="DET-1" />
+ <!-- 67 - Actual Working Width mm --><DLV A="0043" B="" C="DET-1" />
+ <!-- 177 - Actual length of cut mm --><DLV A="00B1" B="" C="DET-1" />
+</TIM>

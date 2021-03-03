@@ -19,9 +19,9 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	private ISO11783TaskDataFile iSO11783TaskDataFile;
 
-	public ISO11783FeatureSource(ISO11783TaskDataFile iSO11783TaskDataFile, ContentEntry entry, Query query) {
+	public ISO11783FeatureSource(ISO11783TaskZipParser iSO11783TaskZipParser, ContentEntry entry, Query query) {
 		super(entry, query);
-		this.iSO11783TaskDataFile = iSO11783TaskDataFile;
+		this.iSO11783TaskDataFile = iSO11783TaskZipParser.taskFile;
 	}
 
 	@Override

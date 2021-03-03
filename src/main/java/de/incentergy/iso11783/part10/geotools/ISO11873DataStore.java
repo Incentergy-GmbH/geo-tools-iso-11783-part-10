@@ -22,12 +22,11 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
-
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11873DataStore extends ContentDataStore {
 	
-	private Map<URL, ISO11783TaskDataFile> files = new ConcurrentHashMap<>();
+	private Map<URL, ISO11783TaskZipParser> files = new ConcurrentHashMap<>();
 
 	static JAXBContext jaxbContext;
 
@@ -55,13 +54,13 @@ public class ISO11873DataStore extends ContentDataStore {
 				Path path = Paths.get(url.toURI());
 				Files.list(path)
                     .filter(consumer -> {
-						return  consumer.endsWith("TASKDATA.XML");
+						return  consumer.toString().toLowerCase().endsWith(".zip");
 					})
                     .forEach((consumer) -> {
                         try {
                             files.put(consumer.toUri().toURL(),
-                                    (ISO11783TaskDataFile) jaxbContext.createUnmarshaller().unmarshal(consumer.toFile()));
-                        } catch (MalformedURLException | JAXBException e) {
+                                    new ISO11783TaskZipParser(consumer.toFile().toURL()));
+                        } catch (MalformedURLException e) {
                             e.printStackTrace();
                         }
                     });

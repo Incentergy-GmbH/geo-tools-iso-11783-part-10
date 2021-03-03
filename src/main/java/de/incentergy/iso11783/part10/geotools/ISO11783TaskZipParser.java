@@ -41,7 +41,7 @@ public class ISO11783TaskZipParser {
 
     Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
     Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
-    private List<TimeLogFileData>  timeLogList;
+    List<TimeLogFileData>  timeLogList;
 
     public ISO11783TaskZipParser(URL url) {
         try (ZipInputStream zipStream = new ZipInputStream(url.openStream())) {
@@ -69,7 +69,6 @@ public class ISO11783TaskZipParser {
                 zipStream.closeEntry();
             }
 
-
             List<TimeLog> taskDataTimeLogList = this.taskFile.getTask().stream().flatMap((task)->task.getTimeLog().stream()).collect(Collectors.toList());
             this.timeLogList = new ArrayList<>();
             for( TimeLog timeLogEntry: taskDataTimeLogList){
@@ -77,12 +76,8 @@ public class ISO11783TaskZipParser {
                 byte[] tlgBIN = timeLogBinFiles.get(timeLogEntry.getFilename() + ".BIN");
                 if( (tlgXML!=null) && (tlgBIN!=null)){
                     this.timeLogList.add(new TimeLogFileData(this.taskFile,timeLogEntry,tlgXML, tlgBIN));
-
                 }
             }
-
-
-
 
         } catch (IOException | JAXBException e) {
             e.printStackTrace();
