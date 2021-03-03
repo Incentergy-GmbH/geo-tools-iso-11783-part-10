@@ -22,8 +22,8 @@ class ISO11873DataStoreTest {
 	@Test
 	void testUpdateFilesFromURL() throws Exception {
         ISO11873DataStore dataStore = new ISO11873DataStore();
-        dataStore.updateFilesFromURL(getClass().getResource("/PartfieldFeatureReaderTest/"));
-        assertEquals(dataStore.getTypeNames().length, 2);
+        dataStore.updateFilesFromURL(getClass().getResource("/ISOXMLGenerator-100/"));
+        assertEquals(3, dataStore.getTypeNames().length);
         assertTrue(dataStore.getTypeNames()[0].endsWith("Partfield"));
     }
 }
