@@ -13,7 +13,6 @@ import javax.xml.bind.JAXBException;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.jupiter.api.Test;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
