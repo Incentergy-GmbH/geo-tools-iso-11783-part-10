@@ -12,7 +12,7 @@ import org.apache.commons.lang3.ObjectUtils.Null;
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11783TaskZipParser {
-    private ISO11783TaskDataFile taskFile;
+    ISO11783TaskDataFile taskFile;
     private List<InputStream> logFiles;
     private List<InputStream> gridFiles;
 
@@ -21,11 +21,13 @@ public class ISO11783TaskZipParser {
             ZipInputStream zipStream = new ZipInputStream(url.openStream());
             ZipEntry entry;
             while ((entry = zipStream.getNextEntry()) != null) {
-                if (entry.getName()) {
-
+                if( entry.isDirectory()== false){
+                    if (entry.getName().toUpperCase().endsWith("TASKDATA.XML")) {
+                            this.taskFile = new ISO11783TaskDataFile();
+                            break;
+                    }
                 }
             }
-            zipStream.getNextEntry();
         } catch (IOException e) {
             e.printStackTrace();
         }
