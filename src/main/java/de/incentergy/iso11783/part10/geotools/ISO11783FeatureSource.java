@@ -58,7 +58,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 			case "Grid":
 				addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
 				break;
-			case "GuidanceLine":
+			case "GuidancePattern":
 				addAttributesForGuidancePattern(builder);
 				break;		}
 

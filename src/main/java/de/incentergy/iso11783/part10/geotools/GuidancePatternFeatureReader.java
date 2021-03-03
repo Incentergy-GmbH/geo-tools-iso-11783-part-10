@@ -32,7 +32,7 @@ import de.incentergy.iso11783.part10.v4.Polygon;
 
 public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 	private static final Logger log = Logger.getLogger(GridFileData.class.getName());
-	public static final String TYPE_NAME_STRING = "GuidanceLine";
+	public static final String TYPE_NAME_STRING = "GuidancePattern";
 	public static SimpleFeatureType FEATURE_TYPE;
 	private ISO11783TaskDataFile taskDataFile;
 	public List<GuidancePattern> guidancePatterns;
@@ -44,14 +44,23 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 	/** Factory class for geometry creation */
 	private GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
 
+
 	// only for unit test
 	GuidancePatternFeatureReader(ISO11783TaskDataFile taskDataFile, SimpleFeatureType featureType) {
 		this.taskDataFile = taskDataFile;
 		this.builder = new SimpleFeatureBuilder(featureType);
+		initializeGuidancePatternList();
 	}
 
 	public GuidancePatternFeatureReader(ISO11783TaskDataFile taskDataFile, ContentState contentState) {
 		this.taskDataFile = taskDataFile;
+		this.state = contentState;
+		builder = new SimpleFeatureBuilder(state.getFeatureType());
+		initializeGuidancePatternList();
+	}
+
+
+	private void initializeGuidancePatternList(){
 		this.guidancePatterns = new ArrayList<>();
 		this.taskDataFile.getPartfield().forEach((partfield)-> {
 			partfield.getGuidanceGroup().forEach((guidanceGroup)->{
@@ -64,8 +73,7 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 					});
 			});
 		});
-		this.state = contentState;
-		builder = new SimpleFeatureBuilder(state.getFeatureType());
+
 	}
 
 	@Override
@@ -79,7 +87,7 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 		builder.set("guidancePatternDesignator", guidancePattern.getGuidancePatternDesignator());
 		builder.set("guidancePatternType", guidancePattern.getGuidancePatternType().toString());
 		if( guidancePattern.getGuidancePatternType() == GuidancePatternType.AB){
-			LineString isoLineString =guidancePattern.getBoundaryPolygon().getLineString().get(0);
+			LineString isoLineString =guidancePattern.getLineString();
 			org.locationtech.jts.geom.LineString lineString =  geometryFactory.createLineString(coordinates(isoLineString));
 			builder.set("guidanceLine", lineString);
 
@@ -106,11 +114,19 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 	}
 
 
+	public int count(){
+		return this.guidancePatterns.size();
+	}
+
 	@Override
 	public SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException {
 		SimpleFeature simpleFeature = convertGuidancePattern2SimpleFeature(guidancePatterns.get(index));
 		index++;
 		return simpleFeature;
+	}
+
+	public Object countFeatures() {
+		return null;
 	}
 
 }
