@@ -125,8 +125,4 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 		return simpleFeature;
 	}
 
-	public Object countFeatures() {
-		return null;
-	}
-
 }
