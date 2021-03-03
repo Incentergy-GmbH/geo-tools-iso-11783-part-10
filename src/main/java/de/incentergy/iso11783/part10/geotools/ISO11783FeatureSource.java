@@ -1,6 +1,8 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.List;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
@@ -12,6 +14,8 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+
+import de.incentergy.iso11783.part10.v4.Time;
 
 public class ISO11783FeatureSource extends ContentFeatureSource {
 
@@ -47,17 +51,32 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
             case "Partfield":
                 addAttributesForPartfield(builder);
             case "TimeLog":
-                addAttributesForTimeLog(builder);
+                addAttributesForTimeLog(builder, iSO11783TaskZipParser);
         }
 
 		final SimpleFeatureType SCHEMA = builder.buildFeatureType();
 		return SCHEMA;
 	}
 
-	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder, ContentEntry entry) {
-		builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
+	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder, ISO11783TaskZipParser iSO11783TaskZipParser) {
+		builder.setCRS(DefaultGeographicCRS.WGS84);
 
-        // byte[] iSO11783TaskZipParser.timeLogXmlFiles[entry.getName().getNamespaceURI()]
+        List<TimeLogFileData> timeLogs = iSO11783TaskZipParser.timeLogList;
+        if (timeLogs.size() == 0) {
+            return;
+        }
+
+        List<Time> times = timeLogs.get(0).getTimes();
+
+        if (times.size() == 0) {
+            return;
+        }
+
+        times.get(0).getDataLogValue().stream().forEach(logValue -> {
+            ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
+            short num = wrapped.getShort();
+            builder.add("DDI" + num, Integer.class);
+        });
     }
 
 	static void addAttributesForPartfield(SimpleFeatureTypeBuilder builder) {
