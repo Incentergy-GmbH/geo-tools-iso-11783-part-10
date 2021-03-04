@@ -7,8 +7,6 @@ import java.net.URL;
 
 import org.junit.jupiter.api.Test;
 
-import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
-
 public class ISO11783TaskZipParserTest {
 
     @Test

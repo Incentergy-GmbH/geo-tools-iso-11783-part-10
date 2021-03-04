@@ -1,15 +1,12 @@
 package de.incentergy.iso11783.part10.geotools;
 
-import static org.junit.Assert.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.Arrays;
 import java.util.List;
 
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
-import org.geotools.feature.NameImpl;
 import org.junit.jupiter.api.Test;
 import org.opengis.feature.type.Name;
 

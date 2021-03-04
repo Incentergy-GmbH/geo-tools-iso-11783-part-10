@@ -3,7 +3,6 @@ package de.incentergy.iso11783.part10.geotools;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
@@ -32,7 +31,7 @@ class TimeLogFeatureReaderTest {
         TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.timeLogList, featureType);
         try {
             SimpleFeature feature = timeLogReader.next();
-            assertEquals(5, feature.getFeatureType().getAttributeCount());
+            assertEquals(6, feature.getFeatureType().getAttributeCount());
             timeLogReader.close();
         } catch (IOException e) {
             e.printStackTrace();
