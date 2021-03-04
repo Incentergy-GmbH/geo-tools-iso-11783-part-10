@@ -51,6 +51,7 @@ public class TimeLogFileData {
     private UUID id = java.util.UUID.randomUUID();
 
     private ISO11783TaskDataFile iso11783TaskData;
+    private TLGAdapter tlgAdapter;
 
     private byte[] xmlFile;
 
@@ -91,9 +92,10 @@ public class TimeLogFileData {
 
     }
 
-    public TimeLogFileData(ISO11783TaskDataFile iso11783TaskData, TimeLog timeLog, byte[] xmlFile, byte[] binFile) {
+    public TimeLogFileData(ISO11783TaskDataFile iso11783TaskData, TLGAdapter tlgAdapter, TimeLog timeLog, byte[] xmlFile, byte[] binFile) {
         super();
         this.iso11783TaskData = iso11783TaskData;
+        this.tlgAdapter = tlgAdapter;
         setBinFile(binFile);
         setXmlFile(xmlFile);
         setTimeLog(timeLog);
@@ -174,6 +176,7 @@ public class TimeLogFileData {
         Unmarshaller unmarshaller = null;
         try {
             unmarshaller = ISO11873DataStore.jaxbContext.createUnmarshaller();
+            unmarshaller.setAdapter(this.tlgAdapter);
         } catch (JAXBException e) {
             log.warning("could not create JAXBContext");
         }

@@ -36,6 +36,7 @@ import de.incentergy.iso11783.part10.v4.TimeLog;
 
 public class ISO11783TaskZipParser {
     ISO11783TaskDataFile taskFile;
+    TLGAdapter tlgAdapter;
     private static Logger log = Logger.getLogger(ISO11783TaskZipParser.class.getName());
     Map<String, byte[]> timeLogBinFiles = new HashMap<>();
     Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
@@ -48,6 +49,7 @@ public class ISO11783TaskZipParser {
     List<GridFileData> gridList = new ArrayList<>();
 
     public ISO11783TaskZipParser(URL url) {
+        this.tlgAdapter = new TLGAdapter();
         try (ZipInputStream zipStream = new ZipInputStream(url.openStream())) {
             ZipEntry entry;
             while ((entry = zipStream.getNextEntry()) != null) {
@@ -72,11 +74,12 @@ public class ISO11783TaskZipParser {
             }
 
             List<TimeLog> taskDataTimeLogList = this.taskFile.getTask().stream().flatMap((task)->task.getTimeLog().stream()).collect(Collectors.toList());
+            this.tlgAdapter.setDeviceElementList(this.taskFile);
             for( TimeLog timeLogEntry: taskDataTimeLogList){
                 byte[] tlgXML = timeLogXmlFiles.get(timeLogEntry.getFilename() + ".XML");
                 byte[] tlgBIN = timeLogBinFiles.get(timeLogEntry.getFilename() + ".BIN");
                 if( (tlgXML!=null) && (tlgBIN!=null)){
-                    this.timeLogList.add(new TimeLogFileData(this.taskFile,timeLogEntry,tlgXML, tlgBIN));
+                    this.timeLogList.add(new TimeLogFileData(this.taskFile, this.tlgAdapter, timeLogEntry, tlgXML, tlgBIN));
                 }
             }
 
