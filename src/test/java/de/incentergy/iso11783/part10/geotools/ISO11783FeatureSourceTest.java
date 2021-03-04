@@ -23,5 +23,10 @@ class ISO11783FeatureSourceTest {
 	@Test
 	void testBuildFeatureType() {
 	}
+	
+	@Test
+	void addAttributesForTimeLog() {
+		
+	}
 
 }
