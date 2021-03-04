@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -16,13 +15,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.TimeZone;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
@@ -433,7 +429,6 @@ public class TimeLogFileData {
 		StartElement startElement = xmlEvent.asStartElement();
 		if (startElement.getName().getLocalPart().equals("PTN")) {
 
-			@SuppressWarnings("unchecked")
 			Iterator<Attribute> it = startElement.getAttributes();
 			while (it.hasNext()) {
 				Attribute attribute = it.next();
