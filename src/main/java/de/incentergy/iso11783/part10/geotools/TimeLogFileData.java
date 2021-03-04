@@ -62,6 +62,7 @@ public class TimeLogFileData {
 
     private static BigDecimal pointOfOriginPositiv = new BigDecimal(1);
     private static BigDecimal pointOfOriginNegativ = new BigDecimal(-1);
+    private static DatatypeFactory datatypeFactory;
 
     static {
         try {
@@ -77,6 +78,12 @@ public class TimeLogFileData {
             date19800101 = new SimpleDateFormat("yyyy-MM-dd").parse("1980-01-01");
         } catch (ParseException e) {
             log.log(Level.SEVERE, "Could not parse date 1980-01-01", e);
+        }
+
+        try {
+            datatypeFactory = DatatypeFactory.newInstance();
+        } catch (DatatypeConfigurationException e) {
+            e.printStackTrace();
         }
     }
 
@@ -380,11 +387,7 @@ public class TimeLogFileData {
 
     private void setTimeStart(Time time, long millisecondsSinceMidnight, int daysSince1980) {
         Calendar cal = getDateFromISO11783(millisecondsSinceMidnight, daysSince1980);
-        try {
-            time.setStart(DatatypeFactory.newInstance().newXMLGregorianCalendar((GregorianCalendar) cal));
-        } catch (DatatypeConfigurationException e) {
-            e.printStackTrace();
-        }
+        time.setStart(datatypeFactory.newXMLGregorianCalendar((GregorianCalendar) cal));
 	}
 
 	public static Calendar getDateFromISO11783(long millisecondsSinceMidnight, int daysSince1980) {
