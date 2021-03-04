@@ -55,13 +55,16 @@ public class ISO11873DataStore extends ContentDataStore {
 
 	@Override
 	protected ContentFeatureSource createFeatureSource(ContentEntry entry) throws IOException {
-        Matcher matcher = EXTRACT_FILENAME.matcher(entry.getName().getLocalPart());
-        if (matcher.matches()) {
-            return new ISO11783FeatureSource(files.get(matcher.group(1)), entry, Query.ALL);
-        }
-
-        return null;
+        return new ISO11783FeatureSource(getZipParser(entry.getName()), entry, Query.ALL);
 	}
+
+    public ISO11783TaskZipParser getZipParser(Name name) {
+        Matcher matcher = EXTRACT_FILENAME.matcher(name.getLocalPart());
+        if (matcher.matches()) {
+            return files.get(matcher.group(1));
+        }
+        return null;
+    }
 
 	public void updateFilesFromURL(URL url){
 		if (url.getProtocol().equals("file")) {

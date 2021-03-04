@@ -23,11 +23,6 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	private ISO11783TaskZipParser iSO11783TaskZipParser;
 
-	public ISO11783FeatureSource(ISO11783TaskZipParser iSO11783TaskZipParser) {
-		super(null, Query.ALL);
-		this.iSO11783TaskZipParser = iSO11783TaskZipParser;
-	}
-
 	public ISO11783FeatureSource(ISO11783TaskZipParser iSO11783TaskZipParser, ContentEntry entry, Query query) {
 		super(entry, query);
 		this.iSO11783TaskZipParser = iSO11783TaskZipParser;
