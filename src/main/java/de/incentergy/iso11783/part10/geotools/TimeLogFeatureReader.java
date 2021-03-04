@@ -45,7 +45,7 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 		time.getDataLogValue().stream().forEach(logValue -> {
 			ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
 			short num = wrapped.getShort();
-			builder.set("DDI" + num, logValue.getProcessDataValue());
+            builder.set("DDI" + num +"_"+logValue.getDeviceElementIdRef(), logValue.getProcessDataValue());
 		});
 
 		return builder.buildFeature(String.valueOf(index));

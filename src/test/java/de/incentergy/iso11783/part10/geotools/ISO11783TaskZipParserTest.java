@@ -10,11 +10,19 @@ import org.junit.jupiter.api.Test;
 public class ISO11783TaskZipParserTest {
 
     @Test
-    void testLoadZipFolderFromGeneratorWith100000Elements(){
+    void testLoadZipFolderFromGeneratorWith100Elements(){
         URL url = getClass().getResource("/ISOXMLGenerator-100/Taskdata-100.zip");
         ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
         assertNotNull(taskZipParser.taskFile);
         assertEquals(100, taskZipParser.timeLogList.get(0).getTimes().size());
+    }
+
+    @Test
+    void testLoadZipFolderFromGeneratorWith100000Elements(){
+        URL url = getClass().getResource("/ISOXMLGenerator-100000/Taskdata-100000.zip");
+        ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
+        assertNotNull(taskZipParser.taskFile);
+        assertEquals(100000, taskZipParser.timeLogList.get(0).getTimes().size());
     }
 
     @Test

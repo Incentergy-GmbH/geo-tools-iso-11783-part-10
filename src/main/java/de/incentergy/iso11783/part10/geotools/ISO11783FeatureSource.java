@@ -89,7 +89,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
         times.get(0).getDataLogValue().stream().forEach(logValue -> {
             ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
             short num = wrapped.getShort();
-            builder.add("DDI" + num, Integer.class);
+            builder.add("DDI" + num + "_" +logValue.getDeviceElementIdRef(), Integer.class);
         });
     }
 
