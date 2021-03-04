@@ -31,4 +31,12 @@ public class ISO11783TaskZipParserTest {
         assertNotNull(taskZipParser.taskFile);
     }
 
+    @Test
+    void testLoadZipFolderWithMachineData(){
+        URL url = getClass().getResource("/TLGData/machinedata_1.zip");
+        ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
+        assertNotNull(taskZipParser.taskFile);
+
+    }
+
 }
