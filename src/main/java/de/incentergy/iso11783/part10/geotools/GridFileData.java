@@ -76,8 +76,8 @@ public class GridFileData {
 				GridEntry gridEntry = new GridEntry();
 				gridEntry.setGridFile(this);
 				gridEntry.setPoint(geometryFactory.createPoint(new Coordinate(
-						grid.getGridMinimumEastPosition().doubleValue() + column * grid.getGridCellEastSize(),
-						grid.getGridMinimumNorthPosition().doubleValue() + row * grid.getGridCellNorthSize())));
+						grid.getGridMinimumEastPosition().doubleValue() + (column + 0.5) * grid.getGridCellEastSize(),
+						grid.getGridMinimumNorthPosition().doubleValue() + (row + 0.5) * grid.getGridCellNorthSize())));
 				readCellValues.accept(gridEntry);
 				getGridEntries().add(gridEntry);
 			}
