@@ -44,7 +44,7 @@ public class WebDAVStorage {
 				if (res.isDirectory()) {
 					processUrl(resourceUrl, files, sardine);
 				} else if (res.getName().toLowerCase().endsWith(".zip")) {
-					files.put(res.getName(),
+					files.put(res.getName().replaceAll("-", ""),
 							new ISO11783TaskZipParser(sardine.get(url.toString() + res.getName())));
 				}
 			}
