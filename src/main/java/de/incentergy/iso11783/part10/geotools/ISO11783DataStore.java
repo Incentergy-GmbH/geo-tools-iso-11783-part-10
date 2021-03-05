@@ -22,7 +22,7 @@ import org.opengis.feature.type.Name;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
-public class ISO11873DataStore extends ContentDataStore {
+public class ISO11783DataStore extends ContentDataStore {
 
 	private Map<String, ISO11783TaskZipParser> files = new ConcurrentHashMap<>();
 

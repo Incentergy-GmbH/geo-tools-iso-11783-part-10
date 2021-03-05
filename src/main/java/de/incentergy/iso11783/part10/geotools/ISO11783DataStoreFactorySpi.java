@@ -45,7 +45,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 			// required
 			new KVP(Param.LEVEL, "advanced"));
 	
-	private static WeakHashMap<Map<String, Serializable>,ISO11873DataStore> dataStoreCache = new WeakHashMap<>();
+	private static WeakHashMap<Map<String, Serializable>,ISO11783DataStore> dataStoreCache = new WeakHashMap<>();
 
 	@Override
 	public String getDisplayName() {
@@ -84,7 +84,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 		if(dataStoreCache.containsKey(params)) {
 			return dataStoreCache.get(params);
 		} else {
-			ISO11873DataStore store = new ISO11873DataStore();
+			ISO11783DataStore store = new ISO11783DataStore();
 			URI namespace = lookup(NAMESPACEP, params, URI.class);
 			if (namespace != null) {
 				store.setNamespaceURI(namespace.toString());

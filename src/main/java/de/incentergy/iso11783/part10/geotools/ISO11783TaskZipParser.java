@@ -62,7 +62,7 @@ public class ISO11783TaskZipParser {
 					zipStream.transferTo(boas);
 					if (upperName.endsWith("TASKDATA.XML")) {
 						ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
-						this.taskFile = (ISO11783TaskDataFile) ISO11873DataStore.jaxbContext.createUnmarshaller()
+						this.taskFile = (ISO11783TaskDataFile) ISO11783DataStore.jaxbContext.createUnmarshaller()
 								.unmarshal(bais);
 					} else if (TLG_BIN_PATTERN.matcher(Path.of(upperName).getFileName().toString()).matches()) {
 						timeLogBinFiles.put(fileName, boas.toByteArray());

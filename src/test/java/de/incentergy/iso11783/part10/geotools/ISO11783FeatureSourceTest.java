@@ -32,7 +32,7 @@ class ISO11783FeatureSourceTest {
 
     @Test
     void testBuildFeatureType() {
-        ISO11873DataStore dataStore = new ISO11873DataStore();
+        ISO11783DataStore dataStore = new ISO11783DataStore();
         dataStore.updateFilesFromURL(getClass().getResource("/TLGData/"));
         Optional<Name> dataName;
         try {

@@ -10,7 +10,7 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.junit.jupiter.api.Test;
 import org.opengis.feature.type.Name;
 
-class ISO11873DataStoreTest {
+class ISO11783DataStoreTest {
 
 	@Test
 	void testCreateTypeNames() throws Exception {
@@ -19,7 +19,7 @@ class ISO11873DataStoreTest {
 
 	@Test
 	void testCreateFeatureSource() throws Exception {
-        ISO11873DataStore dataStore = new ISO11873DataStore();
+        ISO11783DataStore dataStore = new ISO11783DataStore();
         dataStore.updateFilesFromURL(getClass().getResource("/ISOXMLGenerator-100/"));
         List<Name> dataNames = dataStore.createTypeNames();
         ContentEntry entry = new ContentEntry(dataStore, dataNames.get(0));
@@ -29,7 +29,7 @@ class ISO11873DataStoreTest {
 
 	@Test
 	void testUpdateFilesFromURL() throws Exception {
-        ISO11873DataStore dataStore = new ISO11873DataStore();
+        ISO11783DataStore dataStore = new ISO11783DataStore();
         dataStore.updateFilesFromURL(getClass().getResource("/ISOXMLGenerator-100/"));
         assertEquals(4, dataStore.getTypeNames().length);
         assertTrue(dataStore.getTypeNames()[0].startsWith("Partfield"));
