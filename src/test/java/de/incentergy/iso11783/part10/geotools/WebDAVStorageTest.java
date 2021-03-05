@@ -7,14 +7,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 class WebDAVStorageTest {
 
 	// This is an integration test that should not be executed during normal processing
 	@Test
-	@Ignore
+	@Disabled
 	void testProcessFileUrl() throws MalformedURLException {
 
 		Map<String, ISO11783TaskZipParser> files = new HashMap<>();
