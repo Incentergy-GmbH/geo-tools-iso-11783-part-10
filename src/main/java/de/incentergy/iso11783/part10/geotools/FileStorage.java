@@ -24,7 +24,7 @@ public class FileStorage {
 				})
 		        .forEach((consumer) -> {
 		            try {
-		                files.put(consumer.getFileName().toString().replaceAll("-", ""),
+		                files.put(consumer.getFileName().toString().replaceAll("-", "").replaceAll(".zip", ""),
 		                        new ISO11783TaskZipParser(consumer.toUri().toURL()));
 		            } catch (MalformedURLException e) {
 		                e.printStackTrace();
