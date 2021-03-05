@@ -41,9 +41,10 @@ public class ISO11873DataStore extends ContentDataStore {
 	@Override
 	protected List<Name> createTypeNames() throws IOException {
 		return files.keySet().stream()
-				.flatMap(filename -> Stream.of(new NameImpl("Partfield_" + filename.toString()),
-						new NameImpl("TimeLog_" + filename.toString()), new NameImpl("Grid_" + filename.toString()),
-						new NameImpl("GuidancePattern_" + filename.toString())))
+				.flatMap(filename -> Stream.of(new NameImpl(getNamespaceURI(), "Partfield_" + filename.toString()),
+						new NameImpl(getNamespaceURI(), "TimeLog_" + filename.toString()),
+						new NameImpl(getNamespaceURI(), "Grid_" + filename.toString()),
+						new NameImpl(getNamespaceURI(), "GuidancePattern_" + filename.toString())))
 				.collect(Collectors.toList());
 	}
 
