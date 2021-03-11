@@ -98,7 +98,7 @@ public class ISO11783DataStore extends ContentDataStore {
 		}
 		if (this.url.getProtocol().equals("file")) {
 			FileStorage.processFileUrl(this.url, files);
-		} else if (url.getProtocol().equals("http") || url.getProtocol().equals("https")) {
+		} else if (this.url.getProtocol().equals("http") || this.url.getProtocol().equals("https")) {
 			WebDAVStorage.processFileUrl(this.url, files, this.bearerToken, this.username, this.password);
 		}
 	}
