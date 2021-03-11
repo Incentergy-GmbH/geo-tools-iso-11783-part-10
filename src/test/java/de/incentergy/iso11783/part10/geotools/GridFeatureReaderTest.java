@@ -17,8 +17,8 @@ class GridFeatureReaderTest {
 
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 			builder.setName("Test");
-			ISO11783FeatureSource.addAttributesForGrid(builder, parser.gridList);
-		GridFeatureReader gridFeatureReader = new GridFeatureReader(parser.gridList, builder.buildFeatureType());
+			ISO11783FeatureSource.addAttributesForGrid(builder, parser.getGridList());
+		GridFeatureReader gridFeatureReader = new GridFeatureReader(parser.getGridList(), builder.buildFeatureType());
 		assertEquals(56, gridFeatureReader.gridEntries.size());
 		SimpleFeature simpleFeature = gridFeatureReader.next();
 		assertNotNull(simpleFeature);

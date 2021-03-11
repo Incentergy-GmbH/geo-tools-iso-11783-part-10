@@ -28,7 +28,7 @@ class TimeLogFeatureReaderTest {
         ISO11783TaskZipParser parser = new ISO11783TaskZipParser(url);
         ISO11783FeatureSource.addAttributesForTimeLog(builder, parser);
         SimpleFeatureType featureType = builder.buildFeatureType();
-        TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.timeLogList, featureType);
+        TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.getTimeLogList(), featureType);
         try {
             SimpleFeature feature = timeLogReader.next();
             assertEquals(6, feature.getFeatureType().getAttributeCount());
@@ -46,7 +46,7 @@ class TimeLogFeatureReaderTest {
         ISO11783TaskZipParser parser = new ISO11783TaskZipParser(url);
         ISO11783FeatureSource.addAttributesForTimeLog(builder, parser);
         SimpleFeatureType featureType = builder.buildFeatureType();
-        TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.timeLogList, featureType);
+        TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.getTimeLogList(), featureType);
         try {
             assertTrue(timeLogReader.hasNext());
             timeLogReader.close();

@@ -25,8 +25,13 @@ import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import de.incentergy.iso11783.part10.v4.TimeLog;
 
 public class ISO11783TaskZipParser {
-	ISO11783TaskDataFile taskFile;
+	private ISO11783TaskDataFile taskFile;
+
 	private static Logger log = Logger.getLogger(ISO11783TaskZipParser.class.getName());
+
+	private URL url;
+	private InputStream inputStream;
+	private boolean initialize = false;
 	Map<String, byte[]> timeLogBinFiles = new HashMap<>();
 	Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
 	Map<String, byte[]> gridBinFiles = new HashMap<>();
@@ -34,21 +39,16 @@ public class ISO11783TaskZipParser {
 	Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
 	Pattern GRD_BIN_PATTERN = Pattern.compile(".*GRD[0-9]+\\.BIN$");
 	Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
-	List<TimeLogFileData> timeLogList = new ArrayList<>();
-	List<GridFileData> gridList = new ArrayList<>();
+	private List<TimeLogFileData> timeLogList = new ArrayList<>();
+
+	private List<GridFileData> gridList = new ArrayList<>();
 
 	public ISO11783TaskZipParser(URL url) {
-		InputStream inputStream;
-		try {
-			inputStream = url.openStream();
-			parse(inputStream);
-		} catch (IOException e) {
-			log.log(Level.WARNING, "Could not read data from url: " + url, e);
-		}
+		this.url = url;
 	}
 
 	public ISO11783TaskZipParser(InputStream inputStream) {
-		parse(inputStream);
+		this.inputStream = inputStream;
 	}
 
 	private void parse(InputStream inputStream) {
@@ -98,4 +98,35 @@ public class ISO11783TaskZipParser {
 			e.printStackTrace();
 		}
 	}
+	public Map<String, byte[]> getTimeLogXmlFiles() {
+		initIfNecessary();
+		return timeLogXmlFiles;
+	}
+	public List<TimeLogFileData> getTimeLogList() {
+		initIfNecessary();
+		return timeLogList;
+	}
+	public ISO11783TaskDataFile getTaskFile() {
+		initIfNecessary();
+		return taskFile;
+	}
+	public List<GridFileData> getGridList() {
+		initIfNecessary();
+		return gridList;
+	}
+	private void initIfNecessary() {
+		if (!initialize) {
+			try {
+				if (inputStream == null) {
+					inputStream = url.openStream();
+				}
+				parse(inputStream);
+				initialize = true;
+			} catch (IOException e) {
+				log.log(Level.WARNING, "Could not read data from url or input stream: " + url, e);
+			}
+		}
+		
+	}
+
 }

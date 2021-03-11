@@ -41,13 +41,13 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 	@Override
 	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
 		if (entry.getName().getLocalPart().startsWith("Partfield")) {
-            return new PartfieldFeatureReader(iSO11783TaskZipParser.taskFile, getState());
+            return new PartfieldFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
         } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {
-			return new TimeLogFeatureReader(iSO11783TaskZipParser.timeLogList, getState().getFeatureType());
+			return new TimeLogFeatureReader(iSO11783TaskZipParser.getTimeLogList(), getState().getFeatureType());
         } else if (entry.getName().getLocalPart().startsWith("Grid")) {
-            return new GridFeatureReader(iSO11783TaskZipParser.gridList, getState());
+            return new GridFeatureReader(iSO11783TaskZipParser.getGridList(), getState());
         } else if (entry.getName().getLocalPart().startsWith("GuidancePattern")) {
-            return new GuidancePatternFeatureReader(iSO11783TaskZipParser.taskFile, getState());
+            return new GuidancePatternFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
 		}
 		return null;
 	}
@@ -62,7 +62,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
         } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {
             addAttributesForTimeLog(builder, iSO11783TaskZipParser);
         } else if (entry.getName().getLocalPart().startsWith("Grid")) {
-            addAttributesForGrid(builder, iSO11783TaskZipParser.gridList);
+            addAttributesForGrid(builder, iSO11783TaskZipParser.getGridList());
         } else if (entry.getName().getLocalPart().startsWith("GuidancePattern")) {
             addAttributesForGuidancePattern(builder);
         }
@@ -73,7 +73,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 	static void addAttributesForTimeLog(SimpleFeatureTypeBuilder builder, ISO11783TaskZipParser iSO11783TaskZipParser) {
 		builder.setCRS(DefaultGeographicCRS.WGS84);
 
-        List<TimeLogFileData> timeLogs = iSO11783TaskZipParser.timeLogList;
+        List<TimeLogFileData> timeLogs = iSO11783TaskZipParser.getTimeLogList();
         if (timeLogs.size() == 0) {
             return;
         }

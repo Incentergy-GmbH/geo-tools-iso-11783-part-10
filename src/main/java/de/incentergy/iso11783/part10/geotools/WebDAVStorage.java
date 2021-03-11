@@ -44,8 +44,11 @@ public class WebDAVStorage {
 				if (res.isDirectory()) {
 					processUrl(resourceUrl, files, sardine);
 				} else if (res.getName().toLowerCase().endsWith(".zip")) {
-					files.put(res.getName().replaceAll("-", "").replaceAll(".zip", ""),
-							new ISO11783TaskZipParser(sardine.get(url.toString() + res.getName())));
+					String mapKey = res.getName().replaceAll("-", "").replaceAll(".zip", "");
+					if(!files.containsKey(mapKey)) {						
+						files.put(mapKey,
+								new ISO11783TaskZipParser(sardine.get(url.toString() + res.getName())));
+					}
 				}
 			}
 		} catch (IOException e) {

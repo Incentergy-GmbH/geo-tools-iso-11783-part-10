@@ -24,8 +24,11 @@ public class FileStorage {
 				})
 		        .forEach((consumer) -> {
 		            try {
-		                files.put(consumer.getFileName().toString().replaceAll("-", "").replaceAll(".zip", ""),
+		                String mapKey = consumer.getFileName().toString().replaceAll("-", "").replaceAll(".zip", "");
+		                if(!files.containsKey(mapKey)) {
+		                	files.put(mapKey,
 		                        new ISO11783TaskZipParser(consumer.toUri().toURL()));
+		                }
 		            } catch (MalformedURLException e) {
 		                e.printStackTrace();
 		            }

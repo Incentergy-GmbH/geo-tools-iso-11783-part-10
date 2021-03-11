@@ -12,16 +12,13 @@ import org.opengis.feature.type.Name;
 
 class ISO11783DataStoreTest {
 
-	@Test
-	void testCreateTypeNames() throws Exception {
-
-	}
 
 	@Test
 	void testCreateFeatureSource() throws Exception {
         ISO11783DataStore dataStore = new ISO11783DataStore();
         dataStore.updateFilesFromURL(getClass().getResource("/ISOXMLGenerator-100/"));
         List<Name> dataNames = dataStore.createTypeNames();
+        assertEquals(4, dataNames.size());
         ContentEntry entry = new ContentEntry(dataStore, dataNames.get(0));
         ContentFeatureSource featureSource = dataStore.createFeatureSource(entry);
         assertTrue(featureSource instanceof ISO11783FeatureSource);
