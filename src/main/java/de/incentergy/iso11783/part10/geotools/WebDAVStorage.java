@@ -47,7 +47,7 @@ public class WebDAVStorage {
 					String mapKey = res.getName().replaceAll("-", "").replaceAll(".zip", "");
 					if(!files.containsKey(mapKey)) {						
 						files.put(mapKey,
-								new ISO11783TaskZipParser(sardine.get(url.toString() + res.getName())));
+								new ISO11783TaskZipParser(new URL(url.toString() + res.getName())));
 					}
 				}
 			}
