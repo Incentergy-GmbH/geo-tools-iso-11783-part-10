@@ -7,6 +7,7 @@ import java.net.URL;
 
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -31,7 +32,9 @@ class TimeLogFeatureReaderTest {
         TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.getTimeLogList(), featureType);
         try {
             SimpleFeature feature = timeLogReader.next();
-            assertEquals(6, feature.getFeatureType().getAttributeCount());
+            assertEquals(7, feature.getFeatureType().getAttributeCount());
+            assertEquals(Point.class, feature.getFeatureType().getDescriptor("position").getType().getBinding());
+            assertEquals(Long.class, feature.getFeatureType().getDescriptor("time").getType().getBinding());
             timeLogReader.close();
         } catch (IOException e) {
             e.printStackTrace();

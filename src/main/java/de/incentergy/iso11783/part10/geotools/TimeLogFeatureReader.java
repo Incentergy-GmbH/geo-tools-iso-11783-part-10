@@ -42,6 +42,8 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 								firstPosition.getPositionNorth().doubleValue())));
 			}
 		}
+        builder.set("time", time.getStart().toGregorianCalendar().getTimeInMillis());
+
 		time.getDataLogValue().stream().forEach(logValue -> {
 			ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
 			short num = wrapped.getShort();
