@@ -1,9 +1,9 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.Optional;
 
 import org.geotools.data.Query;
@@ -43,7 +43,7 @@ class ISO11783FeatureSourceTest {
             ISO11783FeatureSource featureSource = new ISO11783FeatureSource(dataStore.getZipParser(dataName.get()), entry, Query.ALL);
             SimpleFeatureType featureType = featureSource.buildFeatureType();
             assertEquals(49, featureType.getAttributeCount());
-            assertEquals("DDI271_DET-1", featureType.getAttributeDescriptors().get(11).getLocalName());
+            assertNotNull(featureType.getDescriptor("DDI271_DET-1"));
         } catch (IOException e) {
             e.printStackTrace();
         }

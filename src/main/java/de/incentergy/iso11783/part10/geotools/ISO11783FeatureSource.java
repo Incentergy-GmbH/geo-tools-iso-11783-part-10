@@ -3,6 +3,8 @@ package de.incentergy.iso11783.part10.geotools;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.geotools.data.FeatureReader;
 import org.geotools.data.Query;
@@ -78,19 +80,19 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
             return;
         }
 
-        List<Time> times = timeLogs.get(0).getTimes();
-
-        if (times.size() == 0) {
-            return;
-        }
+        Set<String> attributeNames = timeLogs.stream()
+            .filter(timeLog -> timeLog.getTimes().size() > 0)
+            .flatMap(timeLog -> timeLog.getTimes().get(0).getDataLogValue().stream().map(logValue -> {
+                ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
+                short ddi = wrapped.getShort();
+                return "DDI" + ddi + "_" + logValue.getDeviceElementIdRef();
+            }))
+            .collect(Collectors.toSet());
         
         builder.add("position", Point.class);
         builder.add("time", Long.class);
-
-        times.get(0).getDataLogValue().stream().forEach(logValue -> {
-            ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
-            short num = wrapped.getShort();
-            builder.add("DDI" + num + "_" +logValue.getDeviceElementIdRef(), Integer.class);
+        attributeNames.stream().forEach(attrName -> {
+            builder.add(attrName, Integer.class);
         });
     }
 
