@@ -1,20 +1,25 @@
 package de.incentergy.iso11783.part10.geotools;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import java.io.IOException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
+import de.incentergy.iso11783.part10.v4.*;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.JTS;
+import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.opengis.feature.simple.SimpleFeature;
 
-import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
+import static org.junit.jupiter.api.Assertions.*;
 
 class PartfieldFeatureReaderTest {
 
@@ -24,6 +29,7 @@ class PartfieldFeatureReaderTest {
 			ISO11783TaskDataFile iSO11783TaskDataFile = (ISO11783TaskDataFile) JAXBContext
 					.newInstance(ISO11783TaskDataFile.class).createUnmarshaller()
 					.unmarshal(getClass().getResourceAsStream("/PartfieldFeatureReaderTest/TASKDATA.XML"));
+
 			SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 			builder.setName("Test");
 			ISO11783FeatureSource.addAttributesForPartfield(builder);
@@ -43,4 +49,25 @@ class PartfieldFeatureReaderTest {
 		}
 	}
 
-}
+	@Test
+	public void testForBoundsInternal() {
+		try {
+			ISO11783TaskDataFile iSO11783TaskDataFile = (ISO11783TaskDataFile) JAXBContext
+					.newInstance(ISO11783TaskDataFile.class).createUnmarshaller()
+					.unmarshal(getClass().getResourceAsStream("/PartfieldFeatureReaderTest/TASKDATA.XML"));
+
+			SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+			builder.setName("Some Test");
+			ISO11783FeatureSource.addAttributesForPartfield(builder);
+			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(iSO11783TaskDataFile,
+					builder.buildFeatureType());
+
+			Envelope envelope = partfieldFeatureReader.getBoundsInternal();
+			assertNotNull(envelope);
+			partfieldFeatureReader.close();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	}

@@ -1,18 +1,16 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
+import org.geotools.data.FeatureReader;
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPolygon;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -142,11 +140,42 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 		return jtsPolygon;
 	}
 
+	private void test() {
+		Polygon polygon;
+	}
 	@Override
 	public SimpleFeature next() throws IOException, IllegalArgumentException, NoSuchElementException {
 		SimpleFeature simpleFeature = convertPartField2SimpleFeature(taskDataFile.getPartfield().get(index));
 		index++;
 		return simpleFeature;
+	}
+
+	public Envelope getBoundsInternal() {
+		int len = taskDataFile.getPartfield().size();
+		Envelope old = null;
+		Envelope envelope = null;
+		for(int i = 0; i<len; i++) {
+			Partfield partfield = taskDataFile.getPartfield().get(i);
+			for(Polygon polygon: partfield.getPolygonNonTreatmentZoneOnly()) {
+				Optional<LineString> isoxmlOuterRing = polygon.getLineString().stream()
+						.filter((ls) -> LineStringType.POLYGONEXTERIOR.equals((ls.getLineStringType()))).findAny();
+
+				org.locationtech.jts.geom.LinearRing outerRing = geometryFactory
+						.createLinearRing(closeRing(coordinates(isoxmlOuterRing.get())));
+
+
+				org.locationtech.jts.geom.Polygon polygon1 = geometryFactory.createPolygon(outerRing);
+			    Geometry geometry = (Geometry) polygon1;
+				envelope = JTS.bounds(geometry, DefaultGeographicCRS.WGS84);
+			    if(old == null) {
+			    	old = envelope;
+				}else {
+			    	old.expandToInclude(envelope);
+			    	envelope = old;
+				}
+			}
+		}
+		return envelope;
 	}
 
 }

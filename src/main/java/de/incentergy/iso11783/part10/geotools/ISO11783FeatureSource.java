@@ -2,6 +2,8 @@ package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -11,8 +13,10 @@ import org.geotools.data.Query;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
@@ -32,6 +36,10 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected ReferencedEnvelope getBoundsInternal(Query query) throws IOException {
+		if (entry.getName().getLocalPart().startsWith("Partfield")) {
+			PartfieldFeatureReader partfieldFeatureReader =  new PartfieldFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
+			return (ReferencedEnvelope) partfieldFeatureReader.getBoundsInternal();
+		}
 		return null;
 	}
 
@@ -42,6 +50,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
+		System.out.println("== getReaderInternal ");
 		if (entry.getName().getLocalPart().startsWith("Partfield")) {
             return new PartfieldFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
         } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {
@@ -56,7 +65,7 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected SimpleFeatureType buildFeatureType() throws IOException {
-
+		System.out.println("== buildFeatureType() ");
 		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
 		builder.setName(entry.getName());
         if (entry.getName().getLocalPart().startsWith("Partfield")) {
