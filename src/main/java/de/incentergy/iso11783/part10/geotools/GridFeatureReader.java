@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.locationtech.jts.geom.Envelope;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -59,6 +60,24 @@ public class GridFeatureReader extends AbstractFeatureReader {
 	@Override
 	public void close() throws IOException {
 		
+	}
+
+	public Envelope getBoundsInternal() {
+		Envelope envelope = new Envelope();
+		for(GridFileData gridFileData: gridFileData) {
+			double rows = gridFileData.getGrid().getGridMaximumRow();
+			double cols = gridFileData.getGrid().getGridMaximumColumn();
+
+			double x = gridFileData.getGrid().getGridMinimumEastPosition().doubleValue();
+			double y = gridFileData.getGrid().getGridMinimumNorthPosition().doubleValue();
+
+			double w = gridFileData.getGrid().getGridCellEastSize();
+			double h = gridFileData.getGrid().getGridCellNorthSize();
+
+			envelope.expandToInclude(x, y);
+			envelope.expandToInclude(x + w*cols, y + h*rows);
+			}
+			return envelope;
 	}
 
 }

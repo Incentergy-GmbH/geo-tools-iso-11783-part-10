@@ -7,9 +7,10 @@ import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.geometry.jts.JTSFactoryFinder;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
@@ -71,6 +72,21 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 	@Override
 	public void close() throws IOException {
 
+	}
+
+	public Envelope getBoundsInternal() {
+		int len = timeLogs.size();
+		Envelope envelope = new Envelope();
+		for(int i = 0; i<len; i++) {
+			Time time = timeLogs.get(i);
+			if(time.getPosition() != null && time.getPosition().size()>0) {
+				for(Position position: time.getPosition()) {
+			        	envelope.expandToInclude(position.getPositionEast().doubleValue(),
+								position.getPositionNorth().doubleValue());
+				}
+			}
+		}
+		return envelope;
 	}
 
 }

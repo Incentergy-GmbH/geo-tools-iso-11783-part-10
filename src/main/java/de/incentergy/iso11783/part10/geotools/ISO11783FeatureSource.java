@@ -36,10 +36,18 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected ReferencedEnvelope getBoundsInternal(Query query) throws IOException {
+
 		if (entry.getName().getLocalPart().startsWith("Partfield")) {
 			PartfieldFeatureReader partfieldFeatureReader =  new PartfieldFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
 			return (ReferencedEnvelope) partfieldFeatureReader.getBoundsInternal();
+		}else if(entry.getName().getLocalPart().startsWith("TimeLog")) {
+			TimeLogFeatureReader timeLogFeatureReader = new TimeLogFeatureReader(iSO11783TaskZipParser.getTimeLogList(), getState().getFeatureType());
+			return (ReferencedEnvelope) timeLogFeatureReader.getBoundsInternal();
+		}else if(entry.getName().getLocalPart().startsWith("Grid")) {
+			GridFeatureReader gridFeatureReader = new GridFeatureReader(iSO11783TaskZipParser.getGridList(), getState());
+			return (ReferencedEnvelope) gridFeatureReader.getBoundsInternal();
 		}
+
 		return null;
 	}
 
@@ -50,7 +58,6 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 
 	@Override
 	protected FeatureReader<SimpleFeatureType, SimpleFeature> getReaderInternal(Query query) throws IOException {
-		System.out.println("== getReaderInternal ");
 		if (entry.getName().getLocalPart().startsWith("Partfield")) {
             return new PartfieldFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
         } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {

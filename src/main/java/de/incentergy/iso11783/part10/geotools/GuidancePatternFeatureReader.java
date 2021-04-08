@@ -13,6 +13,7 @@ import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
@@ -123,6 +124,15 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 		SimpleFeature simpleFeature = convertGuidancePattern2SimpleFeature(guidancePatterns.get(index));
 		index++;
 		return simpleFeature;
+	}
+
+	public Envelope getBoundsInternal() {
+		Envelope envelope = new Envelope();
+		for(GuidancePattern guidancePattern:guidancePatterns) {
+			org.locationtech.jts.geom.LineString lineString =  geometryFactory.createLineString(coordinates(guidancePattern.getLineString()));
+			envelope.expandToInclude(lineString.getCoordinate());
+		}
+		return envelope;
 	}
 
 }

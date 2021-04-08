@@ -152,8 +152,7 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 
 	public Envelope getBoundsInternal() {
 		int len = taskDataFile.getPartfield().size();
-		Envelope old = null;
-		Envelope envelope = null;
+		Envelope envelope = new Envelope();
 		for(int i = 0; i<len; i++) {
 			Partfield partfield = taskDataFile.getPartfield().get(i);
 			for(Polygon polygon: partfield.getPolygonNonTreatmentZoneOnly()) {
@@ -163,19 +162,9 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 				org.locationtech.jts.geom.LinearRing outerRing = geometryFactory
 						.createLinearRing(closeRing(coordinates(isoxmlOuterRing.get())));
 
-
-				org.locationtech.jts.geom.Polygon polygon1 = geometryFactory.createPolygon(outerRing);
-			    Geometry geometry = (Geometry) polygon1;
-				envelope = JTS.bounds(geometry, DefaultGeographicCRS.WGS84);
-			    if(old == null) {
-			    	old = envelope;
-				}else {
-			    	old.expandToInclude(envelope);
-			    	envelope = old;
-				}
+				envelope.expandToInclude(outerRing.getCoordinate());
 			}
 		}
 		return envelope;
 	}
-
 }

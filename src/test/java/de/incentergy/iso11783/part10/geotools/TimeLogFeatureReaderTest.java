@@ -5,11 +5,15 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.net.URL;
 
+import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+
+import javax.xml.bind.JAXBContext;
 
 class TimeLogFeatureReaderTest {
 
@@ -62,4 +66,24 @@ class TimeLogFeatureReaderTest {
 	void testClose() {
 	}
 
+    @Test
+    public void testForBoundsInternal() {
+        try {
+            SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+            builder.setName("TEST");
+            URL url = getClass().getResource("/ISOXMLGenerator-100/Taskdata-100.zip");
+            ISO11783TaskZipParser parser = new ISO11783TaskZipParser(url);
+            ISO11783FeatureSource.addAttributesForTimeLog(builder, parser);
+            SimpleFeatureType featureType = builder.buildFeatureType();
+            TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.getTimeLogList(), featureType);
+
+            Envelope envelope = timeLogReader.getBoundsInternal();
+            assertNotNull(envelope);
+            System.out.println("== envelope " + envelope);
+            timeLogReader.close();
+
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
