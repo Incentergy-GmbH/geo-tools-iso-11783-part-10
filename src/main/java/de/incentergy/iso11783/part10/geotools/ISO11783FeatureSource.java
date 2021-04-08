@@ -46,6 +46,9 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 		}else if(entry.getName().getLocalPart().startsWith("Grid")) {
 			GridFeatureReader gridFeatureReader = new GridFeatureReader(iSO11783TaskZipParser.getGridList(), getState());
 			return (ReferencedEnvelope) gridFeatureReader.getBoundsInternal();
+		}else if(entry.getName().getLocalPart().startsWith("GuidancePattern")) {
+			GuidancePatternFeatureReader guidancePatternFeatureReader = new GuidancePatternFeatureReader(iSO11783TaskZipParser.getTaskFile(), getState());
+			return (ReferencedEnvelope) guidancePatternFeatureReader.getBoundsInternal();
 		}
 
 		return null;
