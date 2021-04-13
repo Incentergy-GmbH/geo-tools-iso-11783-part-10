@@ -7,14 +7,19 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
 import de.incentergy.iso11783.part10.v4.CropType;
 import de.incentergy.iso11783.part10.v4.CropVariety;
@@ -53,16 +58,25 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 		return coordinates;
 	}
 
-	// only for unit test
-	PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, SimpleFeatureType featureType) {
+	PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, Name entryName) {
 		this.taskDataFile = taskDataFile;
-		this.builder = new SimpleFeatureBuilder(featureType);
-	}
 
-	public PartfieldFeatureReader(ISO11783TaskDataFile taskDataFile, ContentState contentState) {
-		this.taskDataFile = taskDataFile;
-		this.state = contentState;
-		builder = new SimpleFeatureBuilder(state.getFeatureType());
+		SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
+		builder.setName(entryName);
+        builder.setCRS(DefaultGeographicCRS.WGS84); // <- Coordinate reference system
+		builder.add("polygonNonTreatmentZoneOnly", MultiPolygon.class);
+		builder.add("partfieldId", String.class);
+		builder.add("partfieldCode", String.class);
+		builder.add("partfieldDesignator", String.class);
+		builder.add("partfieldArea", Long.class);
+		builder.add("customerIdRef", String.class);
+		builder.add("farmIdRef", String.class);
+		builder.add("cropTypeIdRef", String.class);
+		builder.add("cropVarietyIdRef", String.class);
+		builder.add("fieldIdRef", String.class);
+        SimpleFeatureType featureType = builder.buildFeatureType();
+
+		this.builder = new SimpleFeatureBuilder(featureType);
 	}
 
 	@Override
@@ -111,7 +125,7 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 
 	@Override
 	public SimpleFeatureType getFeatureType() {
-		return state.getFeatureType();
+		return builder.getFeatureType();
 	}
 
 	@Override
@@ -149,4 +163,14 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 		return simpleFeature;
 	}
 
+    public ReferencedEnvelope getBounds() {
+        ReferencedEnvelope envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+        taskDataFile.getPartfield().stream().forEach(partfield -> {
+            SimpleFeature feature = convertPartField2SimpleFeature(partfield);
+            Geometry geometry = (Geometry)feature.getDefaultGeometry();
+            Envelope partfieldEnvelope = geometry.getEnvelopeInternal();
+            envelope.expandToInclude(partfieldEnvelope);
+        });
+        return envelope;
+    }
 }

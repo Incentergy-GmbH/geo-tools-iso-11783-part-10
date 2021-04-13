@@ -2,33 +2,27 @@ package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.MultiPolygon;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
-import de.incentergy.iso11783.part10.v4.CropType;
-import de.incentergy.iso11783.part10.v4.CropVariety;
-import de.incentergy.iso11783.part10.v4.Customer;
-import de.incentergy.iso11783.part10.v4.Farm;
 import de.incentergy.iso11783.part10.v4.GuidancePattern;
 import de.incentergy.iso11783.part10.v4.GuidancePatternType;
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import de.incentergy.iso11783.part10.v4.LineString;
-import de.incentergy.iso11783.part10.v4.LineStringType;
-import de.incentergy.iso11783.part10.v4.Partfield;
-import de.incentergy.iso11783.part10.v4.Polygon;
 
 public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 	private static final Logger log = Logger.getLogger(GridFileData.class.getName());
@@ -46,8 +40,18 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 
 
 	// only for unit test
-	GuidancePatternFeatureReader(ISO11783TaskDataFile taskDataFile, SimpleFeatureType featureType) {
+	GuidancePatternFeatureReader(ISO11783TaskDataFile taskDataFile, Name entryName) {
 		this.taskDataFile = taskDataFile;
+
+        SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName(entryName);
+        typeBuilder.setCRS(DefaultGeographicCRS.WGS84);
+		typeBuilder.add("guidanceLine", org.locationtech.jts.geom.LineString.class);
+		typeBuilder.add("guidancePatternId", String.class);
+		typeBuilder.add("guidancePatternDesignator", String.class);
+		typeBuilder.add("guidancePatternType", String.class);
+	    SimpleFeatureType featureType = typeBuilder.buildFeatureType();
+
 		this.builder = new SimpleFeatureBuilder(featureType);
 		initializeGuidancePatternList();
 	}
@@ -87,12 +91,10 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 		builder.set("guidancePatternDesignator", guidancePattern.getGuidancePatternDesignator());
 		builder.set("guidancePatternType", guidancePattern.getGuidancePatternType().toString());
 		if( guidancePattern.getGuidancePatternType() == GuidancePatternType.AB){
-			LineString isoLineString =guidancePattern.getLineString();
-			org.locationtech.jts.geom.LineString lineString =  geometryFactory.createLineString(coordinates(isoLineString));
+			LineString isoLineString = guidancePattern.getLineString();
+			org.locationtech.jts.geom.LineString lineString = geometryFactory.createLineString(coordinates(isoLineString));
 			builder.set("guidanceLine", lineString);
-
 		}
-
 
 		return builder.buildFeature(guidancePattern.getGuidancePatternId());
 	}
@@ -124,5 +126,19 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 		index++;
 		return simpleFeature;
 	}
+
+    public ReferencedEnvelope getBounds() {
+        ReferencedEnvelope envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+
+        guidancePatterns.forEach(guidancePattern -> {
+            SimpleFeature feature = convertGuidancePattern2SimpleFeature(guidancePattern);
+            Geometry geom = (Geometry) feature.getDefaultGeometry();
+            if (geom != null) {
+                envelope.expandToInclude(geom.getEnvelopeInternal());
+            }
+        });
+
+        return envelope;
+    }
 
 }

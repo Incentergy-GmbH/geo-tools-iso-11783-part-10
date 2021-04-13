@@ -5,35 +5,49 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
-import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
+import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
+
+import de.incentergy.iso11783.part10.v4.Grid;
 
 public class GridFeatureReader extends AbstractFeatureReader {
 
-	List<GridFileData> gridFileData;
 	int index = 0;
 	List<GridEntry> gridEntries;
 	SimpleFeatureBuilder builder;
 
-	// for unit test
-	GridFeatureReader(List<GridFileData> gridFileData, SimpleFeatureType featureType){
-		this.gridFileData = gridFileData;
-		this.gridEntries = gridFileData.stream().flatMap(gfd -> gfd.getGridEntries().stream()).collect(Collectors.toList());
-		builder = new SimpleFeatureBuilder(featureType);
-	}
+	GridFeatureReader(List<GridFileData> gridFileDataList, Name entryName){
+		this.gridEntries = gridFileDataList.stream()
+            .flatMap(gfd -> gfd.getGridEntries().stream())
+            .collect(Collectors.toList());
 
-	public GridFeatureReader(List<GridFileData> gridFileData, ContentState contentState){
-		this.gridFileData = gridFileData;
-		this.gridEntries = gridFileData.stream().flatMap(gfd -> gfd.getGridEntries().stream()).collect(Collectors.toList());
-		this.state = contentState;
-		builder = new SimpleFeatureBuilder(state.getFeatureType());
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName(entryName);
+        typeBuilder.setCRS(DefaultGeographicCRS.WGS84);
+		typeBuilder.add("point", Point.class);
+
+		int maxEntriesForGrids = gridFileDataList.stream()
+            .mapToInt(gridFileData -> gridFileData.getGridEntries().stream()
+                .mapToInt(gridEntry -> gridEntry.getValues().size())
+                .max().orElse(0))
+            .max().orElse(0);
+		for (int i = 0; i < maxEntriesForGrids; i++) {
+			typeBuilder.add("value-" + (i + 1), Integer.class);
+		}
+	    SimpleFeatureType featureType = typeBuilder.buildFeatureType();
+
+		builder = new SimpleFeatureBuilder(featureType);
 	}
 
 	@Override
 	public SimpleFeatureType getFeatureType() {
-		return state.getFeatureType();
+		return builder.getFeatureType();
 	}
 
 	@Override
@@ -60,5 +74,23 @@ public class GridFeatureReader extends AbstractFeatureReader {
 	public void close() throws IOException {
 		
 	}
+
+    public ReferencedEnvelope getBounds() {
+        ReferencedEnvelope envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+
+        gridEntries.stream().forEach(gridEntry -> {
+            Grid grid = gridEntry.getGridFile().getGrid();
+            double x = grid.getGridMinimumEastPosition().doubleValue();
+            double y = grid.getGridMinimumNorthPosition().doubleValue();
+            double w = grid.getGridCellEastSize();
+            double h = grid.getGridCellNorthSize();
+            double cols = grid.getGridMaximumColumn();
+            double rows = grid.getGridMaximumRow();
+            envelope.expandToInclude(x, y);
+            envelope.expandToInclude(x + w * cols, y + h * rows);
+        });
+
+        return envelope;
+    }
 
 }

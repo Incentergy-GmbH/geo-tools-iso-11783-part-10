@@ -4,14 +4,20 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
+import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.feature.type.Name;
 
 import de.incentergy.iso11783.part10.v4.Position;
 import de.incentergy.iso11783.part10.v4.Time;
@@ -25,9 +31,30 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 	/** Factory class for geometry creation */
 	private GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
 
-	public TimeLogFeatureReader(List<TimeLogFileData> timeLogList, SimpleFeatureType featureType) {
+	public TimeLogFeatureReader(List<TimeLogFileData> timeLogList, Name entryName) {
 		timeLogs = timeLogList.stream().flatMap(timeLogFileData -> timeLogFileData.getTimes().stream())
 				.collect(Collectors.toList());
+
+		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
+		typeBuilder.setName(entryName);
+        typeBuilder.setCRS(DefaultGeographicCRS.WGS84);
+
+        Set<String> attributeNames = timeLogList.stream()
+            .filter(timeLog -> timeLog.getTimes().size() > 0)
+            .flatMap(timeLog -> timeLog.getTimes().get(0).getDataLogValue().stream().map(logValue -> {
+                ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
+                short ddi = wrapped.getShort();
+                return "DDI" + ddi + "_" + logValue.getDeviceElementIdRef();
+            }))
+            .collect(Collectors.toSet());
+        
+        typeBuilder.add("position", Point.class);
+        typeBuilder.add("time", Long.class);
+        attributeNames.stream().forEach(attrName -> {
+            typeBuilder.add(attrName, Integer.class);
+        });
+        
+		SimpleFeatureType featureType = typeBuilder.buildFeatureType();
 
 		builder = new SimpleFeatureBuilder(featureType);
 	}
@@ -73,4 +100,19 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 
 	}
 
+    ReferencedEnvelope getBounds() {
+        ReferencedEnvelope envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
+        timeLogs.stream().forEach(time -> {
+            if (time.getPosition().size() == 0) {
+                return;
+            }
+
+            Position pos = time.getPosition().get(0);
+            envelope.expandToInclude(
+                pos.getPositionEast().doubleValue(),
+                pos.getPositionNorth().doubleValue()
+            );
+        });
+        return envelope;
+    }
 }

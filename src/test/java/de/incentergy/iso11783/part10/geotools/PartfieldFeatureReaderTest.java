@@ -10,7 +10,9 @@ import java.util.NoSuchElementException;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
+import org.geotools.feature.NameImpl;
+import org.geotools.geometry.jts.ReferencedEnvelope;
+import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.jupiter.api.Test;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -24,11 +26,10 @@ class PartfieldFeatureReaderTest {
 			ISO11783TaskDataFile iSO11783TaskDataFile = (ISO11783TaskDataFile) JAXBContext
 					.newInstance(ISO11783TaskDataFile.class).createUnmarshaller()
 					.unmarshal(getClass().getResourceAsStream("/PartfieldFeatureReaderTest/TASKDATA.XML"));
-			SimpleFeatureTypeBuilder builder = new SimpleFeatureTypeBuilder();
-			builder.setName("Test");
-			ISO11783FeatureSource.addAttributesForPartfield(builder);
-			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(iSO11783TaskDataFile,
-					builder.buildFeatureType());
+			PartfieldFeatureReader partfieldFeatureReader = new PartfieldFeatureReader(
+                iSO11783TaskDataFile,
+                new NameImpl("Test")
+            );
 			assertTrue(partfieldFeatureReader.hasNext());
 			SimpleFeature simpleFeature = partfieldFeatureReader.next();
 			assertFalse(partfieldFeatureReader.hasNext());
@@ -38,9 +39,19 @@ class PartfieldFeatureReaderTest {
 					simpleFeature.getDefaultGeometry().toString());
 			partfieldFeatureReader.close();
 
+            ReferencedEnvelope envelope = partfieldFeatureReader.getBounds();
+
+            assertTrue(
+                envelope.equals(
+                    new ReferencedEnvelope(
+                        12.398375219, 12.40245353, 50.263255734, 50.265484242,
+                        DefaultGeographicCRS.WGS84
+                    )
+                )
+            );
+
 		} catch (JAXBException | IllegalArgumentException | NoSuchElementException | IOException e) {
 			e.printStackTrace();
 		}
 	}
-
 }
