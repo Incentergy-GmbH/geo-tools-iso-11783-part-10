@@ -22,9 +22,18 @@ import org.opengis.feature.type.Name;
 import de.incentergy.iso11783.part10.v4.Position;
 import de.incentergy.iso11783.part10.v4.Time;
 
+class TimeWithFilename {
+    public Time time;
+    public String filename;
+    TimeWithFilename(Time time, String filename) {
+        this.time = time;
+        this.filename = filename;
+    }
+}
+
 public class TimeLogFeatureReader extends AbstractFeatureReader {
 
-	private List<Time> timeLogs;
+	private List<TimeWithFilename> timeLogs;
 	protected SimpleFeatureBuilder builder;
 	protected int index = 0;
 
@@ -32,8 +41,11 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 	private GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
 
 	public TimeLogFeatureReader(List<TimeLogFileData> timeLogList, Name entryName) {
-		timeLogs = timeLogList.stream().flatMap(timeLogFileData -> timeLogFileData.getTimes().stream())
-				.collect(Collectors.toList());
+		timeLogs = timeLogList.stream()
+            .flatMap(timeLogFileData -> timeLogFileData.getTimes().stream()
+                .map(time -> new TimeWithFilename(time, timeLogFileData.getTimeLog().getFilename()))
+            )
+            .collect(Collectors.toList());
 
 		SimpleFeatureTypeBuilder typeBuilder = new SimpleFeatureTypeBuilder();
 		typeBuilder.setName(entryName);
@@ -50,6 +62,7 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
         
         typeBuilder.add("position", Point.class);
         typeBuilder.add("time", Long.class);
+        typeBuilder.add("filename", String.class);
         attributeNames.stream().forEach(attrName -> {
             typeBuilder.add(attrName, Integer.class);
         });
@@ -59,19 +72,20 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 		builder = new SimpleFeatureBuilder(featureType);
 	}
 
-	private SimpleFeature convertTimeLog2SimpleFeature(Time time) {
+	private SimpleFeature convertTimeLog2SimpleFeature(TimeWithFilename timeWithFilename) {
 
-		if (time.getPosition().size() > 0) {
-			Position firstPosition = time.getPosition().get(0);
+		if (timeWithFilename.time.getPosition().size() > 0) {
+			Position firstPosition = timeWithFilename.time.getPosition().get(0);
 			if (firstPosition.getPositionEast() != null && firstPosition.getPositionNorth() != null) {
 				builder.set("position",
 						geometryFactory.createPoint(new Coordinate(firstPosition.getPositionEast().doubleValue(),
 								firstPosition.getPositionNorth().doubleValue())));
 			}
 		}
-        builder.set("time", time.getStart().toGregorianCalendar().getTimeInMillis());
+        builder.set("time", timeWithFilename.time.getStart().toGregorianCalendar().getTimeInMillis());
+        builder.set("filename", timeWithFilename.filename);
 
-		time.getDataLogValue().stream().forEach(logValue -> {
+		timeWithFilename.time.getDataLogValue().stream().forEach(logValue -> {
 			ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
 			short num = wrapped.getShort();
             builder.set("DDI" + num +"_"+logValue.getDeviceElementIdRef(), logValue.getProcessDataValue());
@@ -102,12 +116,12 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 
     ReferencedEnvelope getBounds() {
         ReferencedEnvelope envelope = new ReferencedEnvelope(DefaultGeographicCRS.WGS84);
-        timeLogs.stream().forEach(time -> {
-            if (time.getPosition().size() == 0) {
+        timeLogs.stream().forEach(timeWithFilename -> {
+            if (timeWithFilename.time.getPosition().size() == 0) {
                 return;
             }
 
-            Position pos = time.getPosition().get(0);
+            Position pos = timeWithFilename.time.getPosition().get(0);
             envelope.expandToInclude(
                 pos.getPositionEast().doubleValue(),
                 pos.getPositionNorth().doubleValue()

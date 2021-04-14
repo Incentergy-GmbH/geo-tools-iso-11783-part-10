@@ -29,9 +29,10 @@ class TimeLogFeatureReaderTest {
         TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.getTimeLogList(), new NameImpl("Test"));
         try {
             SimpleFeature feature = timeLogReader.next();
-            assertEquals(7, feature.getFeatureType().getAttributeCount());
+            assertEquals(8, feature.getFeatureType().getAttributeCount());
             assertEquals(Point.class, feature.getFeatureType().getDescriptor("position").getType().getBinding());
             assertEquals(Long.class, feature.getFeatureType().getDescriptor("time").getType().getBinding());
+            assertEquals("TLG00001", (String) feature.getAttribute("filename"));
             timeLogReader.close();
         } catch (IOException e) {
             e.printStackTrace();

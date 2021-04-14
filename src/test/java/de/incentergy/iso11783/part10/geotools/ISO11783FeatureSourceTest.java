@@ -42,7 +42,7 @@ class ISO11783FeatureSourceTest {
 
             ISO11783FeatureSource featureSource = new ISO11783FeatureSource(dataStore.getZipParser(dataName.get()), entry, Query.ALL);
             SimpleFeatureType featureType = featureSource.buildFeatureType();
-            assertEquals(49, featureType.getAttributeCount());
+            assertEquals(50, featureType.getAttributeCount());
             assertNotNull(featureType.getDescriptor("DDI271_DET-1"));
         } catch (IOException e) {
             e.printStackTrace();
