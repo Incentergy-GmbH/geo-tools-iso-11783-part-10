@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.logging.Logger;
 
-import org.geotools.data.store.ContentState;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.geotools.geometry.jts.JTSFactoryFinder;
@@ -56,14 +55,6 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 		initializeGuidancePatternList();
 	}
 
-	public GuidancePatternFeatureReader(ISO11783TaskDataFile taskDataFile, ContentState contentState) {
-		this.taskDataFile = taskDataFile;
-		this.state = contentState;
-		builder = new SimpleFeatureBuilder(state.getFeatureType());
-		initializeGuidancePatternList();
-	}
-
-
 	private void initializeGuidancePatternList(){
 		this.guidancePatterns = new ArrayList<>();
 		this.taskDataFile.getPartfield().forEach((partfield)-> {
@@ -107,7 +98,7 @@ public class GuidancePatternFeatureReader extends AbstractFeatureReader {
 
 	@Override
 	public SimpleFeatureType getFeatureType() {
-		return state.getFeatureType();
+		return builder.getFeatureType();
 	}
 
 	@Override
