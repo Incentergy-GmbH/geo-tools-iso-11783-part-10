@@ -4,9 +4,11 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +20,12 @@ import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import javax.xml.bind.JAXBException;
+import com.sun.xml.bind.IDResolver;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Unmarshaller;
+
+import de.incentergy.iso11783.part10.v4.ExternalFileContents;
 import de.incentergy.iso11783.part10.v4.Grid;
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import de.incentergy.iso11783.part10.v4.TimeLog;
@@ -35,10 +41,16 @@ public class ISO11783TaskZipParser {
 	Map<String, byte[]> timeLogBinFiles = new HashMap<>();
 	Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
 	Map<String, byte[]> gridBinFiles = new HashMap<>();
+	Map<String, byte[]> externalFiles = new HashMap<>();
 
-	Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
-	Pattern GRD_BIN_PATTERN = Pattern.compile(".*GRD[0-9]+\\.BIN$");
-	Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
+    // order matters!
+    final private List<String> EXTERNAL_FILES_PREFIXES =
+        Arrays.asList("CCG", "CCT", "CLD", "CPC", "CTP", "CTR", "DVC", "FRM", "OTQ", "PDT", "PFD", "PGP", "WKR", "VPN", "TSK");
+	final private Pattern TLG_BIN_PATTERN = Pattern.compile(".*TLG[0-9]+\\.BIN$");
+	final private Pattern GRD_BIN_PATTERN = Pattern.compile(".*GRD[0-9]+\\.BIN$");
+	final private Pattern TLG_XML_PATTERN = Pattern.compile(".*TLG[0-9]+\\.XML$");
+	final private Pattern EXTERNAL_FILE_PATTERN = Pattern.compile(".*(" + String.join("|", EXTERNAL_FILES_PREFIXES) + ")[0-9]+\\.XML$");
+
 	private List<TimeLogFileData> timeLogList = new ArrayList<>();
 
 	private List<GridFileData> gridList = new ArrayList<>();
@@ -51,8 +63,24 @@ public class ISO11783TaskZipParser {
 		this.inputStream = inputStream;
 	}
 
+    private void addExternalContent(ExternalFileContents content) {
+        Arrays.stream(content.getClass().getMethods()).forEach(method -> {
+            try {
+                Method taskFileMethod = this.taskFile.getClass().getMethod(method.getName());
+
+                List<Object> newObjects = (List<Object>) method.invoke(content);
+                List<Object> taskFileObjects = (List<Object>) taskFileMethod.invoke(this.taskFile);
+
+                taskFileObjects.addAll(newObjects);
+            } catch (Exception e) {
+
+            }
+        });
+    }
+
 	private void parse(InputStream inputStream) {
 		try (ZipInputStream zipStream = new ZipInputStream(inputStream)) {
+            MultipleFilesIDResolver resolver = new MultipleFilesIDResolver();
 			ZipEntry entry;
 			while ((entry = zipStream.getNextEntry()) != null) {
 				if (entry.isDirectory() == false) {
@@ -62,18 +90,39 @@ public class ISO11783TaskZipParser {
 					zipStream.transferTo(boas);
 					if (upperName.endsWith("TASKDATA.XML")) {
 						ByteArrayInputStream bais = new ByteArrayInputStream(boas.toByteArray());
-						this.taskFile = (ISO11783TaskDataFile) ISO11783DataStore.jaxbContext.createUnmarshaller()
-								.unmarshal(bais);
+                        final Unmarshaller unmarshaller = ISO11783DataStore.jaxbContextMain.createUnmarshaller();
+                        unmarshaller.setProperty(IDResolver.class.getName(), resolver);
+						this.taskFile = (ISO11783TaskDataFile) unmarshaller.unmarshal(bais);
 					} else if (TLG_BIN_PATTERN.matcher(Path.of(upperName).getFileName().toString()).matches()) {
 						timeLogBinFiles.put(fileName, boas.toByteArray());
 					} else if (TLG_XML_PATTERN.matcher(upperName).matches()) {
 						timeLogXmlFiles.put(fileName, boas.toByteArray());
 					} else if (GRD_BIN_PATTERN.matcher(upperName).matches()) {
 						gridBinFiles.put(fileName, boas.toByteArray());
+					} else if (EXTERNAL_FILE_PATTERN.matcher(upperName).matches()) {
+						externalFiles.put(fileName, boas.toByteArray());
 					}
 				}
 				zipStream.closeEntry();
 			}
+
+            EXTERNAL_FILES_PREFIXES.stream().forEach((String prefix) -> {
+                this.taskFile.getExternalFileReference().stream()
+                    .filter(xfr -> xfr.getFilename().startsWith(prefix))
+                    .forEach(xfr -> {
+                        try {
+                            Unmarshaller unmarshaller = ISO11783DataStore.jaxbContextExternal.createUnmarshaller();
+                            unmarshaller.setProperty(IDResolver.class.getName(), resolver);
+                            ExternalFileContents contents = (ExternalFileContents) unmarshaller.unmarshal(
+                                new ByteArrayInputStream(externalFiles.get(xfr.getFilename() + ".XML"))
+                            );
+                            addExternalContent(contents);
+                        } catch(JAXBException e) {
+                            e.printStackTrace();
+                        }
+                        // log.log(Level.WARNING, xfr.getFilename());
+                    });
+            });
 
 			List<TimeLog> taskDataTimeLogList = this.taskFile.getTask().stream()
 					.flatMap((task) -> task.getTimeLog().stream()).collect(Collectors.toList());

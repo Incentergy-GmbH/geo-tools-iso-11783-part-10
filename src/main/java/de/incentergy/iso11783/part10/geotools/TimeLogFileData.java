@@ -176,7 +176,7 @@ public class TimeLogFileData {
         Map<String, Boolean> structureMap = createStructureMap(new ByteArrayInputStream(getXmlFile()));
         Unmarshaller unmarshaller = null;
         try {
-            unmarshaller = ISO11783DataStore.jaxbContext.createUnmarshaller();
+            unmarshaller = ISO11783DataStore.jaxbContextMain.createUnmarshaller();
         } catch (JAXBException e) {
             log.warning("could not create JAXBContext");
         }

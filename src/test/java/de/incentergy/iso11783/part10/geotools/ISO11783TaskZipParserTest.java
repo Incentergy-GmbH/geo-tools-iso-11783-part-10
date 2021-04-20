@@ -7,6 +7,8 @@ import java.net.URL;
 
 import org.junit.jupiter.api.Test;
 
+import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
+
 public class ISO11783TaskZipParserTest {
 
     @Test
@@ -43,8 +45,16 @@ public class ISO11783TaskZipParserTest {
     void testLoadZipFolderWithMachineData(){
         URL url = getClass().getResource("/TLGData/machinedata_1.zip");
         ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
-        assertNotNull(taskZipParser.getTaskFile());
-
+        ISO11783TaskDataFile taskFile = taskZipParser.getTaskFile();
+        assertNotNull(taskFile);
     }
 
+    @Test
+    void testLoadZipFolderWithExternalFiles(){
+        URL url = getClass().getResource("/ExternalFileReferences/2021-04-09T15_33_26_taskdata.zip");
+        ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
+        ISO11783TaskDataFile taskFile = taskZipParser.getTaskFile();
+        assertNotNull(taskFile);
+        assertEquals(15, taskFile.getPartfield().size());
+    }
 }

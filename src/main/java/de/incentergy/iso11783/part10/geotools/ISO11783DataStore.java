@@ -23,6 +23,7 @@ import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
+import de.incentergy.iso11783.part10.v4.ExternalFileContents;
 
 public class ISO11783DataStore extends ContentDataStore {
 	
@@ -37,11 +38,13 @@ public class ISO11783DataStore extends ContentDataStore {
 
 	Pattern EXTRACT_FILENAME = Pattern.compile("[^_]+_(.*)$");
 
-	static JAXBContext jaxbContext;
+	static JAXBContext jaxbContextMain;
+	static JAXBContext jaxbContextExternal;
 
 	static {
 		try {
-			jaxbContext = JAXBContext.newInstance(ISO11783TaskDataFile.class);
+			jaxbContextMain = JAXBContext.newInstance(ISO11783TaskDataFile.class);
+			jaxbContextExternal = JAXBContext.newInstance(ExternalFileContents.class);
 		} catch (JAXBException e) {
 			e.printStackTrace();
 		}
