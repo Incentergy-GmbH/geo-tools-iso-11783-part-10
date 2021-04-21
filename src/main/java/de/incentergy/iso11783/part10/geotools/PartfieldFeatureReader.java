@@ -1,10 +1,10 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -106,13 +106,11 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 			builder.set("fieldIdRef", ((Partfield) partfield.getFieldIdRef()).getPartfieldId());
 		}
 
-		org.locationtech.jts.geom.Polygon[] polygons = partfield.getPolygonNonTreatmentZoneOnly().stream()
-				.map((Polygon isoxmlPolygon) -> {
-					return mapPolygon(isoxmlPolygon);
-				}).toArray(org.locationtech.jts.geom.Polygon[]::new);
-		MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(polygons);
+		MultiPolygon multiPolygon = mapPolygons(partfield.getPolygonNonTreatmentZoneOnly());
 
-		builder.set("polygonNonTreatmentZoneOnly", multiPolygon);
+        if (multiPolygon != null) {
+            builder.set("polygonNonTreatmentZoneOnly", multiPolygon);
+        }
 
 		return builder.buildFeature(partfield.getPartfieldId());
 	}
@@ -133,27 +131,78 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 		return index < taskDataFile.getPartfield().size();
 	}
 
-	public org.locationtech.jts.geom.Polygon mapPolygon(Polygon isoxmlPolygon) {
-		Optional<LineString> isoxmlOuterRing = isoxmlPolygon.getLineString().stream()
-				.filter((ls) -> LineStringType.POLYGONEXTERIOR.equals((ls.getLineStringType()))).findAny();
-		if (!isoxmlOuterRing.isPresent()) {
+    // Take the outer rings from all the ISOXML Polygons and associate with each of them inner rings
+    // (regardless the original ISOXML Polygon). Convert each outer ring and corresponding inner rings
+    // to Polygons and return the Multipolygon constructed from all the Polygons
+    // 
+    // This algorithm works for both v3 and v4 of ISOXML standard. Moreover, it works for some cases of
+    // invalid geometry, such as ISOXML Polygons without outer rings
+	public MultiPolygon mapPolygons(List<Polygon> isoxmlPolygons) {
+
+		List<LineString> isoxmlOuterRings = isoxmlPolygons.stream().flatMap(
+            polygon -> polygon.getLineString().stream()
+                .filter(ls -> LineStringType.POLYGONEXTERIOR.equals(ls.getLineStringType()))
+        ).collect(Collectors.toList());
+            
+		if (isoxmlOuterRings.size() == 0) {
 			return null;
 		}
 
-		List<LineString> isoxmlInnerRings = isoxmlPolygon.getLineString().stream()
-				.filter((ls) -> LineStringType.POLYGONINTERIOR.equals(ls.getLineStringType()))
-				.collect(Collectors.toList());
+		List<LineString> isoxmlInnerRings = isoxmlPolygons.stream().flatMap(
+            polygon -> polygon.getLineString().stream()
+                .filter(ls -> LineStringType.POLYGONINTERIOR.equals(ls.getLineStringType()))
+        ).collect(Collectors.toList());
 
-		org.locationtech.jts.geom.LinearRing outerRing = geometryFactory
-				.createLinearRing(closeRing(coordinates(isoxmlOuterRing.get())));
+		List<org.locationtech.jts.geom.LinearRing> outerRings = isoxmlOuterRings.stream()
+            .map(ls -> geometryFactory.createLinearRing(closeRing(coordinates(ls))))
+            .collect(Collectors.toList());
 
-		org.locationtech.jts.geom.LinearRing[] innerRings = isoxmlInnerRings.stream()
-				.map(ls -> geometryFactory.createLinearRing(closeRing(coordinates(ls))))
-				.toArray(org.locationtech.jts.geom.LinearRing[]::new);
+		List<org.locationtech.jts.geom.LinearRing> innerRings = isoxmlInnerRings.stream()
+            .map(ls -> geometryFactory.createLinearRing(closeRing(coordinates(ls))))
+            .collect(Collectors.toList());
 
-		org.locationtech.jts.geom.Polygon jtsPolygon = geometryFactory.createPolygon(outerRing, innerRings);
+        // performance optimization
+        if (outerRings.size() == 1) {
+            org.locationtech.jts.geom.Polygon jtsPolygon = geometryFactory.createPolygon(
+                outerRings.get(0),
+                innerRings.toArray(org.locationtech.jts.geom.LinearRing[]::new)
+            );
+            return geometryFactory.createMultiPolygon(new org.locationtech.jts.geom.Polygon[] { jtsPolygon });
+        }
 
-		return jtsPolygon;
+        List<Integer> outerRingIdx = innerRings.stream().map(innerRing -> {
+            org.locationtech.jts.geom.Polygon innerPolygon = geometryFactory.createPolygon(innerRing);
+
+            double biggestArea = 0;
+            Integer bestIdx = -1;
+            for (int i = 0; i < outerRings.size(); i++) {
+                org.locationtech.jts.geom.Polygon outerPolygon = geometryFactory.createPolygon(outerRings.get(i));
+                double area = outerPolygon.intersection(innerPolygon).getArea();
+
+                if (area > biggestArea) {
+                    biggestArea = area;
+                    bestIdx = i;
+                }
+            }
+            return bestIdx;
+        }).collect(Collectors.toList());
+
+        org.locationtech.jts.geom.Polygon[] jtsPolygons = new org.locationtech.jts.geom.Polygon[outerRings.size()];
+        for (int outerIdx = 0; outerIdx < outerRings.size(); outerIdx++) {
+            List<org.locationtech.jts.geom.LineString> currentInnerRings = new ArrayList<>();
+            for (int innerIdx = 0; innerIdx < outerRings.size(); innerIdx++) {
+                if (outerRingIdx.get(innerIdx) == outerIdx) {
+                    currentInnerRings.add(innerRings.get(innerIdx));
+                }
+            }
+
+            jtsPolygons[outerIdx] = geometryFactory.createPolygon(
+                outerRings.get(outerIdx),
+                innerRings.toArray(org.locationtech.jts.geom.LinearRing[]::new)
+            );
+        }
+
+        return geometryFactory.createMultiPolygon(jtsPolygons);
 	}
 
 	@Override
@@ -168,9 +217,16 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
         taskDataFile.getPartfield().stream().forEach(partfield -> {
             SimpleFeature feature = convertPartField2SimpleFeature(partfield);
             Geometry geometry = (Geometry)feature.getDefaultGeometry();
-            Envelope partfieldEnvelope = geometry.getEnvelopeInternal();
-            envelope.expandToInclude(partfieldEnvelope);
+
+            if (geometry != null) {
+                Envelope partfieldEnvelope = geometry.getEnvelopeInternal();
+                envelope.expandToInclude(partfieldEnvelope);
+            }
         });
+
+        if (envelope.isEmpty()) {
+            return null;
+        }
         return envelope;
     }
 }
