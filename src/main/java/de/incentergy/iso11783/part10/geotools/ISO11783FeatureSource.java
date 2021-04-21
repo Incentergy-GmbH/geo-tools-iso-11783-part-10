@@ -31,6 +31,12 @@ public class ISO11783FeatureSource extends ContentFeatureSource {
 	protected ReferencedEnvelope getBoundsInternal(Query query) throws IOException {
 		if (entry.getName().getLocalPart().startsWith("Partfield")) {
             return partfieldFeatureReader.getBounds();
+        } else if (entry.getName().getLocalPart().startsWith("TimeLog")) {
+            return timeLogFeatureReader.getBounds();
+        } else if (entry.getName().getLocalPart().startsWith("Grid")) {
+            return gridFeatureReader.getBounds();
+        } else if (entry.getName().getLocalPart().startsWith("GuidancePattern")) {
+            return guidancePatternFeatureReader.getBounds();
         }
 		return null;
 	}
