@@ -81,7 +81,7 @@ public class PartfieldFeatureReader extends AbstractFeatureReader {
 
 	@Override
 	public void close() throws IOException {
-
+        index = 0; //FIXME
 	}
 
 	public SimpleFeature convertPartField2SimpleFeature(Partfield partfield) {

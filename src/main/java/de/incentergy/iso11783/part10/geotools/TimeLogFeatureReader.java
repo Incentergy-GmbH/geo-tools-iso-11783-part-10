@@ -111,7 +111,7 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 
 	@Override
 	public void close() throws IOException {
-
+        index = 0; //FIXME
 	}
 
     ReferencedEnvelope getBounds() {
