@@ -11,6 +11,7 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
 import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 class TimeLogFeatureReaderTest {
 
@@ -24,15 +25,18 @@ class TimeLogFeatureReaderTest {
 
 	@Test
 	void testNext() {
-        URL url = getClass().getResource("/ISOXMLGenerator-100/Taskdata-100.zip");
+        URL url = getClass().getResource("/TLGData/machinedata_1.zip");
         ISO11783TaskZipParser parser = new ISO11783TaskZipParser(url);
         TimeLogFeatureReader timeLogReader = new TimeLogFeatureReader(parser.getTimeLogList(), new NameImpl("Test"));
         try {
             SimpleFeature feature = timeLogReader.next();
-            assertEquals(8, feature.getFeatureType().getAttributeCount());
-            assertEquals(Point.class, feature.getFeatureType().getDescriptor("position").getType().getBinding());
-            assertEquals(Long.class, feature.getFeatureType().getDescriptor("time").getType().getBinding());
-            assertEquals("TLG00001", (String) feature.getAttribute("filename"));
+            SimpleFeatureType featureType = feature.getFeatureType();
+            assertEquals(50, featureType.getAttributeCount());
+            assertEquals(Point.class, featureType.getDescriptor("position").getType().getBinding());
+            assertEquals(Long.class, featureType.getDescriptor("time").getType().getBinding());
+            assertEquals("TLG00004", (String) feature.getAttribute("filename"));
+            assertNotNull(featureType.getDescriptor("DDI60170_DET-1"));
+            assertNotNull(featureType.getDescriptor("DDI117_DET-1"));
             timeLogReader.close();
         } catch (IOException e) {
             e.printStackTrace();

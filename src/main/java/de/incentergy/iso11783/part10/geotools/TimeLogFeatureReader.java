@@ -2,6 +2,7 @@ package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -19,6 +20,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.feature.type.Name;
 
+import de.incentergy.iso11783.part10.v4.DataLogValue;
 import de.incentergy.iso11783.part10.v4.Position;
 import de.incentergy.iso11783.part10.v4.Time;
 
@@ -40,6 +42,23 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 	/** Factory class for geometry creation */
 	private GeometryFactory geometryFactory = JTSFactoryFinder.getGeometryFactory(null);
 
+    private String constructAttributeName(DataLogValue logValue) {
+        ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
+        int num = Unsigned.getUnsignedShort(wrapped);
+
+        List<String> components = new ArrayList<>();
+        components.add("DDI" + num);
+        components.add(logValue.getDeviceElementIdRef());
+
+        if (logValue.getDataLogPGN() != null) {
+            components.add(logValue.getDataLogPGN().toString());
+            components.add(logValue.getDataLogPGNStartBit().toString());
+            components.add(logValue.getDataLogPGNStopBit().toString());
+        }
+
+        return String.join("_", components);
+    }
+
 	public TimeLogFeatureReader(List<TimeLogFileData> timeLogList, Name entryName) {
 		timeLogs = timeLogList.stream()
             .flatMap(timeLogFileData -> timeLogFileData.getTimes().stream()
@@ -53,11 +72,9 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
 
         Set<String> attributeNames = timeLogList.stream()
             .filter(timeLog -> timeLog.getTimes().size() > 0)
-            .flatMap(timeLog -> timeLog.getTimes().get(0).getDataLogValue().stream().map(logValue -> {
-                ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
-                short ddi = wrapped.getShort();
-                return "DDI" + ddi + "_" + logValue.getDeviceElementIdRef();
-            }))
+            .flatMap(timeLog -> timeLog.getTimes().get(0).getDataLogValue().stream()
+                .map(logValue -> constructAttributeName(logValue))
+            )
             .collect(Collectors.toSet());
         
         typeBuilder.add("position", Point.class);
@@ -86,9 +103,7 @@ public class TimeLogFeatureReader extends AbstractFeatureReader {
         builder.set("filename", timeWithFilename.filename);
 
 		timeWithFilename.time.getDataLogValue().stream().forEach(logValue -> {
-			ByteBuffer wrapped = ByteBuffer.wrap(logValue.getProcessDataDDI()); // big-endian by default
-			short num = wrapped.getShort();
-            builder.set("DDI" + num +"_"+logValue.getDeviceElementIdRef(), logValue.getProcessDataValue());
+            builder.set(constructAttributeName(logValue), logValue.getProcessDataValue());
 		});
 
 		return builder.buildFeature(String.valueOf(index));

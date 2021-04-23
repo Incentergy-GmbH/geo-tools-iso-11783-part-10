@@ -8,7 +8,6 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
 import org.geotools.data.DataStore;
