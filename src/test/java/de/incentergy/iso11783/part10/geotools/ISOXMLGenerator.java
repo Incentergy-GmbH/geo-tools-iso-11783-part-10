@@ -56,6 +56,7 @@ import de.incentergy.iso11783.part10.v4.TimeType;
 
 public class ISOXMLGenerator {
 
+	private static final double FACTOR = 0.000001;
 	private static Date date19800101;
 
 	static {
@@ -67,7 +68,7 @@ public class ISOXMLGenerator {
 	}
 
 	public static void main(String[] args) throws JAXBException, IOException, DatatypeConfigurationException {
-		for (int sampleCount : Arrays.asList(100)) {
+		for (int sampleCount : Arrays.asList(1000000)) {
 			ISO11783TaskDataFile iso11783TaskData = new ISO11783TaskDataFile();
 			iso11783TaskData.setManagementSoftwareManufacturer(ISOXMLGenerator.class.getSimpleName());
 
@@ -102,10 +103,13 @@ public class ISOXMLGenerator {
 
 			iso11783TaskData.getCropType().add(cropType);
 
-			Partfield partfield = getPartfield(farm, customer, cropType,
-					cropVariety);
+			Partfield partfield = null;
+			for(int i =0;i<300;i++) {
+				partfield = getPartfield(farm, customer, cropType,
+					cropVariety, i);
+				iso11783TaskData.getPartfield().add(partfield);
+			}
 
-			iso11783TaskData.getPartfield().add(partfield);
 
 			CulturalPractice culturalPractice = new CulturalPractice();
 			culturalPractice.setCulturalPracticeDesignator("Häckseln");
@@ -207,12 +211,12 @@ public class ISOXMLGenerator {
 		}
 	}
 
-	private static Partfield getPartfield(Farm farm, Customer customer, CropType cropType, CropVariety cropVariety) {
+	private static Partfield getPartfield(Farm farm, Customer customer, CropType cropType, CropVariety cropVariety, double offset) {
 //		<PFD A="PFD1" B="ed5440f0-5304-408a-a527-33b68b28" C="7 Partfield 2017" D="45550" E="CTR1" F="FRM1">
 		Partfield partfield = new Partfield();
-		partfield.setPartfieldId("PFD-1");
-		partfield.setPartfieldCode("ed5440f0-5304-408a-a527-33b68b28");
-		partfield.setPartfieldDesignator("7 Partfield 2017");
+		partfield.setPartfieldId("PFD-1"+offset);
+		partfield.setPartfieldCode("ed5440f0-5304-408a-a527-33b68b28"+offset);
+		partfield.setPartfieldDesignator("7 Partfield 2017 "+offset);
 		partfield.setPartfieldArea(45550);
 		partfield.setCustomerIdRef(customer);
 		partfield.setFarmIdRef(farm);
@@ -234,254 +238,254 @@ public class ISOXMLGenerator {
 //                <PNT A="2" C="48.263976880" D="11.402130956"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263976880");
-		point.setPointEast("11.402130956");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263976880")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402130956")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263908764" D="11.401874961"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263908764");
-		point.setPointEast("11.401874961");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263908764")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401874961")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263887622" D="11.401789806"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263887622");
-		point.setPointEast("11.401789806");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263887622")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401789806")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263689209" D="11.400962091"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263689209");
-		point.setPointEast("11.400962091");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263689209")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400962091")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263575196" D="11.400517699"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263575196");
-		point.setPointEast("11.400517699");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263575196")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400517699")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263499410" D="11.400214418"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263499410");
-		point.setPointEast("11.400214418");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263499410")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400214418")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263480128" D="11.400111694"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263480128");
-		point.setPointEast("11.400111694");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263480128")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400111694")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263436836" D="11.399885878"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263436836");
-		point.setPointEast("11.399885878");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263436836")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.399885878")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263421201" D="11.399746213"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263421201");
-		point.setPointEast("11.399746213");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263421201")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.399746213")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263377912" D="11.399309188"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263377912");
-		point.setPointEast("11.399309188");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263377912")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.399309188")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263338741" D="11.398913061"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263338741");
-		point.setPointEast("11.398913061");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263338741")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398913061")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263317916" D="11.398739579"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263317916");
-		point.setPointEast("11.398739579");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263317916")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398739579")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263276036" D="11.398572779"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263276036");
-		point.setPointEast("11.398572779");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263276036")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398572779")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263266554" D="11.398551832"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263266554");
-		point.setPointEast("11.398551832");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263266554")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398551832")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263255734" D="11.398499315"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263255734");
-		point.setPointEast("11.398499315");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263255734")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398499315")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263271096" D="11.398449415"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263271096");
-		point.setPointEast("11.398449415");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263271096")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398449415")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263418495" D="11.398404987"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263418495");
-		point.setPointEast("11.398404987");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263418495")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398404987")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263516830" D="11.398388626"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263516830");
-		point.setPointEast("11.398388626");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263516830")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398388626")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263712430" D="11.398375219"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263712430");
-		point.setPointEast("11.398375219");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263712430")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398375219")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264052443" D="11.398425483"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264052443");
-		point.setPointEast("11.398425483");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264052443")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398425483")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264387098" D="11.398445939"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264387098");
-		point.setPointEast("11.398445939");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264387098")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398445939")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264428974" D="11.398499601"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264428974");
-		point.setPointEast("11.398499601");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264428974")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398499601")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264466515" D="11.398583393"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264466515");
-		point.setPointEast("11.398583393");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264466515")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398583393")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264495033" D="11.398655469"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264495033");
-		point.setPointEast("11.398655469");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264495033")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.398655469")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264618201" D="11.399078446"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264618201");
-		point.setPointEast("11.399078446");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264618201")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.399078446")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264702365" D="11.399317350"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264702365");
-		point.setPointEast("11.399317350");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264702365")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.399317350")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264985318" D="11.399960169"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264985318");
-		point.setPointEast("11.399960169");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264985318")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.399960169")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265180980" D="11.400437665"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265180980");
-		point.setPointEast("11.400437665");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265180980")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400437665")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265241794" D="11.400608785"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265241794");
-		point.setPointEast("11.400608785");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265241794")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400608785")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265303932" D="11.400820380"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265303932");
-		point.setPointEast("11.400820380");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265303932")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.400820380")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265398992" D="11.401246308"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265398992");
-		point.setPointEast("11.401246308");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265398992")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401246308")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265450545" D="11.401471501"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265450545");
-		point.setPointEast("11.401471501");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265450545")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401471501")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265484242" D="11.401632680"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265484242");
-		point.setPointEast("11.401632680");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265484242")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401632680")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265175010" D="11.401865639"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265175010");
-		point.setPointEast("11.401865639");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265175010")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401865639")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.265025275" D="11.401987263"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.265025275");
-		point.setPointEast("11.401987263");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.265025275")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401987263")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264869705" D="11.402093599"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264869705");
-		point.setPointEast("11.402093599");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264869705")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402093599")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264704865" D="11.402198696"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264704865");
-		point.setPointEast("11.402198696");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264704865")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402198696")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264552084" D="11.402287892"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264552084");
-		point.setPointEast("11.402287892");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264552084")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402287892")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264363834" D="11.402352986"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264363834");
-		point.setPointEast("11.402352986");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264363834")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402352986")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264207491" D="11.402397101"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264207491");
-		point.setPointEast("11.402397101");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264207491")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402397101")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264072612" D="11.402453530"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264072612");
-		point.setPointEast("11.402453530");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264072612")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402453530")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.263976880" D="11.402130956"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.263976880");
-		point.setPointEast("11.402130956");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.263976880")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.402130956")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //            </LSG>
 //            <LSG A="2">
@@ -491,32 +495,32 @@ public class ISOXMLGenerator {
 //                <PNT A="2" C="48.264104862" D="11.401441980"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264104862");
-		point.setPointEast("11.401441980");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264104862")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401441980")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264072184" D="11.401383904"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264072184");
-		point.setPointEast("11.401383904");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264072184")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401383904")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264034434" D="11.401422732"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264034434");
-		point.setPointEast("11.401422732");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264034434")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401422732")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264062750" D="11.401489344"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264062750");
-		point.setPointEast("11.401489344");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264062750")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401489344")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //                <PNT A="2" C="48.264104862" D="11.401441980"/>
 		point = new Point();
 		point.setPointType("2");
-		point.setPointNorth("48.264104862");
-		point.setPointEast("11.401441980");
+		point.setPointNorth(Double.valueOf(Double.parseDouble("48.264104862")+offset*FACTOR).toString());
+		point.setPointEast(Double.valueOf(Double.parseDouble("11.401441980")+offset*FACTOR).toString());
 		lineString.getPoint().add(point);
 //            </LSG>
 //        </PLN>
