@@ -25,6 +25,7 @@ import com.sun.xml.bind.IDResolver;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
+import de.incentergy.iso11783.part10.v4.Device;
 import de.incentergy.iso11783.part10.v4.ExternalFileContents;
 import de.incentergy.iso11783.part10.v4.Grid;
 import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
@@ -54,6 +55,8 @@ public class ISO11783TaskZipParser {
 	private List<TimeLogFileData> timeLogList = new ArrayList<>();
 
 	private List<GridFileData> gridList = new ArrayList<>();
+
+    private List<Device> deviceList = new ArrayList<>();
 
 	public ISO11783TaskZipParser(URL url) {
 		this.url = url;
@@ -143,6 +146,8 @@ public class ISO11783TaskZipParser {
 				}
 			}
 
+            this.deviceList = this.taskFile.getDevice();
+
 		} catch (IOException | JAXBException e) {
 			e.printStackTrace();
 		}
@@ -163,6 +168,12 @@ public class ISO11783TaskZipParser {
 		initIfNecessary();
 		return gridList;
 	}
+
+    public List<Device> getDeviceList() {
+		initIfNecessary();
+        return deviceList;
+    }
+
 	private void initIfNecessary() {
 		if (!initialize) {
 			try {

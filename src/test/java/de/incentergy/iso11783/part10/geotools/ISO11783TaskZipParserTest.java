@@ -47,6 +47,7 @@ public class ISO11783TaskZipParserTest {
         ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
         ISO11783TaskDataFile taskFile = taskZipParser.getTaskFile();
         assertNotNull(taskFile);
+        assertEquals(1, taskZipParser.getDeviceList().size());
     }
 
     @Test
