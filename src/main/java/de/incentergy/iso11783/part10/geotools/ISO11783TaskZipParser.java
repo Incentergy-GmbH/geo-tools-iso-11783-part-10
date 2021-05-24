@@ -174,6 +174,10 @@ public class ISO11783TaskZipParser {
         return deviceList;
     }
 
+    public URL getURL() {
+        return url;
+    }
+
 	private void initIfNecessary() {
 		if (!initialize) {
 			try {

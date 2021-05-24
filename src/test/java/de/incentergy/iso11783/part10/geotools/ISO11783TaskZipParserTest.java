@@ -58,4 +58,10 @@ public class ISO11783TaskZipParserTest {
         assertNotNull(taskFile);
         assertEquals(15, taskFile.getPartfield().size());
     }
+    @Test
+    void testGetURL(){
+        URL url = getClass().getResource("/ExternalFileReferences/2021-04-09T15_33_26_taskdata.zip");
+        ISO11783TaskZipParser taskZipParser = new ISO11783TaskZipParser(url);
+        assertEquals(url, taskZipParser.getURL());
+    }
 }

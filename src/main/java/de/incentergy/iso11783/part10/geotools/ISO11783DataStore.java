@@ -66,6 +66,10 @@ public class ISO11783DataStore extends ContentDataStore {
 		return new ISO11783FeatureSource(getZipParser(entry.getName()), entry, Query.ALL);
 	}
 
+    public List<URL> getAvailableURLs() {
+        return files.values().stream().map(zipParser -> zipParser.getURL()).collect(Collectors.toList());
+    }
+
 	public ISO11783TaskZipParser getZipParser(Name name) {
 		Matcher matcher = EXTRACT_FILENAME.matcher(name.getLocalPart());
 		if (matcher.matches()) {
