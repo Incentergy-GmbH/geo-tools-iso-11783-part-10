@@ -1,6 +1,7 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,13 @@ public class WebDAVStorage {
 		} else {
 			sardine = SardineFactory.begin();
 		}
-		processUrl(url, files, sardine);
+
+        try {
+            URL normalizedURL = url.toString().endsWith("/") ? url : new URL(url.toString() + "/");
+            processUrl(normalizedURL, files, sardine);
+        } catch(MalformedURLException e)  {
+
+        }
 
 	}
 
