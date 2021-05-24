@@ -86,6 +86,9 @@ public class ISO11783DataStore extends ContentDataStore {
 		updateFilesFromURL(url, null, null, null);
 	}
 
+    // "url" can be either local path or remove WebDAV folder url
+    // "bearerToken" parameter doesn't include "Bearer " prefix
+    // Either "bearerToken" or "username" + "password" parameters should be provided togather with WebDAV URLs
 	public void updateFilesFromURL(URL url, String bearerToken, String username, String password) {
 		if(url == null && this.url == null) {
 			log.warning("Url not set");

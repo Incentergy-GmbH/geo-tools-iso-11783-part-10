@@ -40,7 +40,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 			new KVP(Param.LEVEL, "advanced"));
 	
 	public static final Param AUTHORIZATION_BEARER_TOKENP = new Param("authorization_header_bearer", String.class,
-			"Authorization bearer token e.g. 'eyv...', overwrite username and password", false, null, // not
+			"Authorization bearer token without 'Bearer' prefix e.g. 'eyv...', overwrite username and password", false, null, // not
 			// required
 			new KVP(Param.LEVEL, "advanced"));
 	
