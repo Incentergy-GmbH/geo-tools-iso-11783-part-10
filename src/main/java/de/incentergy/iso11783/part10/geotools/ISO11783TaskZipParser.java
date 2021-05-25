@@ -32,6 +32,9 @@ import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import de.incentergy.iso11783.part10.v4.TimeLog;
 
 public class ISO11783TaskZipParser {
+    static interface InputStreamProvider {
+        InputStream getInputStream(URL url) throws IOException;
+    }
 	private ISO11783TaskDataFile taskFile;
 
 	private static Logger log = Logger.getLogger(ISO11783TaskZipParser.class.getName());
@@ -39,6 +42,7 @@ public class ISO11783TaskZipParser {
 	private URL url;
 	private InputStream inputStream;
 	private boolean initialize = false;
+    private InputStreamProvider streamProvider;
 	Map<String, byte[]> timeLogBinFiles = new HashMap<>();
 	Map<String, byte[]> timeLogXmlFiles = new HashMap<>();
 	Map<String, byte[]> gridBinFiles = new HashMap<>();
@@ -60,10 +64,12 @@ public class ISO11783TaskZipParser {
 
 	public ISO11783TaskZipParser(URL url) {
 		this.url = url;
+        this.streamProvider = fileUrl -> fileUrl.openStream();
 	}
 
-	public ISO11783TaskZipParser(InputStream inputStream) {
-		this.inputStream = inputStream;
+	public ISO11783TaskZipParser(URL url, InputStreamProvider streamProvider) {
+		this.url = url;
+		this.streamProvider = streamProvider;
 	}
 
     private void addExternalContent(ExternalFileContents content) {
@@ -81,7 +87,7 @@ public class ISO11783TaskZipParser {
         });
     }
 
-	private void parse(InputStream inputStream) {
+	private void parse() {
 		try (ZipInputStream zipStream = new ZipInputStream(inputStream)) {
             MultipleFilesIDResolver resolver = new MultipleFilesIDResolver();
 			ZipEntry entry;
@@ -182,9 +188,9 @@ public class ISO11783TaskZipParser {
 		if (!initialize) {
 			try {
 				if (inputStream == null) {
-					inputStream = url.openStream();
+					inputStream = this.streamProvider.getInputStream(url);
 				}
-				parse(inputStream);
+				parse();
 				initialize = true;
 			} catch (IOException e) {
 				log.log(Level.WARNING, "Could not read data from url or input stream: " + url, e);

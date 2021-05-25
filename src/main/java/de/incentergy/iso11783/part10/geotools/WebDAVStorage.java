@@ -1,6 +1,7 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
@@ -12,6 +13,18 @@ import com.github.sardine.DavResource;
 import com.github.sardine.Sardine;
 import com.github.sardine.SardineFactory;
 import com.github.sardine.impl.SardineImpl;
+
+class WebDAVStreamProvider implements ISO11783TaskZipParser.InputStreamProvider {
+    private Sardine sardine;
+    WebDAVStreamProvider(Sardine sardine) {
+        this.sardine = sardine;
+    }
+
+    @Override
+    public InputStream getInputStream(URL url) throws IOException {
+        return this.sardine.get(url.toString());
+    }
+}
 
 public class WebDAVStorage {
 
@@ -53,8 +66,8 @@ public class WebDAVStorage {
 				} else if (res.getName().toLowerCase().endsWith(".zip")) {
 					String mapKey = res.getName().replaceAll("-", "").replaceAll(".zip", "");
 					if(!files.containsKey(mapKey)) {						
-						files.put(mapKey,
-								new ISO11783TaskZipParser(new URL(url.toString() + res.getName())));
+                        URL fileURL = new URL(url.toString() + res.getName());
+						files.put(mapKey, new ISO11783TaskZipParser(fileURL, new WebDAVStreamProvider(sardine)));
 					}
 				}
 			}

@@ -1,6 +1,7 @@
 package de.incentergy.iso11783.part10.geotools;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.net.URL;
@@ -32,6 +33,7 @@ class ISO11783DataStoreTest {
         assertEquals(4, dataStore.getTypeNames().length);
         assertTrue(dataStore.getTypeNames()[0].startsWith("Partfield"));
     }
+
 	@Test
 	void testGetAvailableURLs() throws Exception {
         ISO11783DataStore dataStore = new ISO11783DataStore();
@@ -39,5 +41,14 @@ class ISO11783DataStoreTest {
         List<URL> urls = dataStore.getAvailableURLs();
         assertEquals(1, urls.size());
         assertTrue(urls.get(0).toString().endsWith("Taskdata-100.zip"));
+    }
+
+	@Test
+	void testGetZipParserByURL() throws Exception {
+        ISO11783DataStore dataStore = new ISO11783DataStore();
+        dataStore.updateFilesFromURL(getClass().getResource("/ISOXMLGenerator-100/"));
+        List<URL> urls = dataStore.getAvailableURLs();
+        ISO11783TaskZipParser zipParser = dataStore.getZipParser(urls.get(0));
+        assertNotNull(zipParser);
     }
 }

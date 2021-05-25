@@ -77,6 +77,10 @@ public class ISO11783DataStore extends ContentDataStore {
 		}
 		return null;
 	}
+
+	public ISO11783TaskZipParser getZipParser(URL url) {
+		return files.values().stream().filter(zp -> zp.getURL().equals(url)).findAny().orElse(null);
+	}
 	
 	public void updateFiles() {
 		updateFilesFromURL(null, null, null, null);
