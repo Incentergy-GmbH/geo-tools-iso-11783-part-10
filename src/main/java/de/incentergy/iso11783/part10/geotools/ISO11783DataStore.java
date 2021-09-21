@@ -81,6 +81,13 @@ public class ISO11783DataStore extends ContentDataStore {
 	public ISO11783TaskZipParser getZipParser(URL url) {
 		return files.values().stream().filter(zp -> zp.getURL().equals(url)).findAny().orElse(null);
 	}
+
+	public void updateBearerToken(String bearerToken) {
+        this.bearerToken = bearerToken;
+		if (this.url.getProtocol().equals("http") || this.url.getProtocol().equals("https")) {
+            WebDAVStorage.updateBeareToken(files, bearerToken);
+        }
+	}
 	
 	public void updateFiles() {
 		updateFilesFromURL(null, null, null, null);

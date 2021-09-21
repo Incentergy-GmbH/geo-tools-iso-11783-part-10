@@ -50,6 +50,11 @@ public class WebDAVStorage {
         }
 
 	}
+	public static void updateBeareToken(Map<String, ISO11783TaskZipParser> files, String bearerToken) {
+        Sardine sardine = new SardineImpl(bearerToken);
+        WebDAVStreamProvider streamProvider = new WebDAVStreamProvider(sardine);
+        files.forEach((key, value) -> value.updateStreamProvider(streamProvider));
+    }
 
 	static void processUrl(URL url, Map<String, ISO11783TaskZipParser> files, Sardine sardine) {
 		List<DavResource> resources;
@@ -68,7 +73,9 @@ public class WebDAVStorage {
 					if(!files.containsKey(mapKey)) {						
                         URL fileURL = new URL(url.toString() + res.getName());
 						files.put(mapKey, new ISO11783TaskZipParser(fileURL, new WebDAVStreamProvider(sardine)));
-					}
+					} else {
+                        files.get(mapKey).updateStreamProvider(new WebDAVStreamProvider(sardine));
+                    }
 				}
 			}
 		} catch (IOException e) {
