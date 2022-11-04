@@ -4,13 +4,12 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -22,14 +21,18 @@ import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.NameImpl;
 import org.opengis.feature.type.Name;
 
-import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
+import com.google.common.cache.CacheBuilder;
+
 import de.incentergy.iso11783.part10.v4.ExternalFileContents;
+import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11783DataStore extends ContentDataStore {
 	
 	private static Logger log = Logger.getLogger(ISO11783DataStore.class.getName());
 
-	private Map<String, ISO11783TaskZipParser> files = new ConcurrentHashMap<>();
+	private Map<String, ISO11783TaskZipParser> files = (ConcurrentMap<String, ISO11783TaskZipParser>) (ConcurrentMap<?, ?>) CacheBuilder.newBuilder()
+	.maximumSize(100)
+	.build().asMap();
 
 	private URL url;
 	private String bearerToken;
