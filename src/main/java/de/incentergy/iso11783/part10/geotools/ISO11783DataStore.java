@@ -5,25 +5,24 @@ import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import java.util.logging.Logger;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 
-import org.geotools.data.Query;
+import org.geotools.api.data.Query;
+import org.geotools.api.feature.type.Name;
 import org.geotools.data.store.ContentDataStore;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.geotools.feature.NameImpl;
-import org.opengis.feature.type.Name;
 
-import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 import de.incentergy.iso11783.part10.v4.ExternalFileContents;
+import de.incentergy.iso11783.part10.v4.ISO11783TaskDataFile;
 
 public class ISO11783DataStore extends ContentDataStore {
 	

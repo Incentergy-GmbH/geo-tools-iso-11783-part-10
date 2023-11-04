@@ -10,7 +10,7 @@ import java.util.List;
 import org.geotools.data.store.ContentEntry;
 import org.geotools.data.store.ContentFeatureSource;
 import org.junit.jupiter.api.Test;
-import org.opengis.feature.type.Name;
+import org.geotools.api.feature.type.Name;
 
 class ISO11783DataStoreTest {
 

@@ -2,7 +2,6 @@ package de.incentergy.iso11783.part10.geotools;
 
 import java.awt.RenderingHints.Key;
 import java.io.IOException;
-import java.io.Serializable;
 import java.net.URI;
 import java.net.URL;
 import java.util.Collections;
@@ -10,8 +9,8 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
-import org.geotools.data.DataStore;
-import org.geotools.data.DataStoreFactorySpi;
+import org.geotools.api.data.DataStore;
+import org.geotools.api.data.DataStoreFactorySpi;
 import org.geotools.factory.CommonFactoryFinder;
 import org.geotools.feature.type.FeatureTypeFactoryImpl;
 import org.geotools.util.KVP;
@@ -44,7 +43,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 			// required
 			new KVP(Param.LEVEL, "advanced"));
 	
-	private static WeakHashMap<Map<String, Serializable>,ISO11783DataStore> dataStoreCache = new WeakHashMap<>();
+	private static WeakHashMap<Map<String, ?>,ISO11783DataStore> dataStoreCache = new WeakHashMap<>();
 
 	@Override
 	public String getDisplayName() {
@@ -62,7 +61,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 	}
 
 	@Override
-	public boolean canProcess(Map<String, Serializable> params) {
+	public boolean canProcess(Map<String, ?> params) {
 		// params must not contain ISOXML
 		return params.containsKey("isoxmlUrl");
 	}
@@ -79,7 +78,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 	}
 
 	@Override
-	public DataStore createDataStore(Map<String, Serializable> params) throws IOException {
+	public DataStore createDataStore(Map<String, ?> params) throws IOException {
 		if(dataStoreCache.containsKey(params)) {
 			return dataStoreCache.get(params);
 		} else {
@@ -119,7 +118,8 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 	 * @return
 	 * @throws IOException
 	 */
-	<T> T lookup(Param param, Map<String, Serializable> params, Class<T> target) throws IOException {
+	@SuppressWarnings("unchecked")
+	<T> T lookup(Param param, Map<String, ?> params, Class<T> target) throws IOException {
 		T result = (T) param.lookUp(params);
 		if (result == null) {
 			return (T) param.getDefaultValue();
@@ -129,7 +129,7 @@ public class ISO11783DataStoreFactorySpi implements DataStoreFactorySpi {
 	}
 
 	@Override
-	public DataStore createNewDataStore(Map<String, Serializable> params) throws IOException {
+	public DataStore createNewDataStore(Map<String, ?> params) throws IOException {
 		throw new UnsupportedOperationException("ISOXML Datastore is read only");
 	}
 }
