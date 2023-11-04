@@ -72,6 +72,11 @@ public class ISO11783TaskZipParser {
 		this.streamProvider = streamProvider;
 	}
 
+    public void updateStreamProvider(InputStreamProvider streamProvider) {
+        log.info("update stream provider");
+		this.streamProvider = streamProvider;
+    }
+
     private void addExternalContent(ExternalFileContents content) {
         Arrays.stream(content.getClass().getMethods()).forEach(method -> {
             try {
